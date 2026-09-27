@@ -1,0 +1,358 @@
+<ion-content class="bg-progreso" (click)="closeDropdowns()">
+
+  <!-- Backdrop when dropdown is open -->
+  <div class="dropdown-backdrop" *ngIf="showNotifications || showProfile" (click)="closeDropdowns()"></div>
+
+  <!-- Global Header -->
+  <div class="app-global-header">
+    <div class="brand-left">
+      <img src="assets/images/Logo.png" alt="ARQ-Metabolica MX" class="brand-logo">
+      <span class="brand-text">ARQ-Metabolica MX</span>
+    </div>
+    <div class="actions-right">
+      <button class="theme-toggle-btn" (click)="toggleTheme()" id="theme-toggle-educacion">
+        <ion-icon [name]="isDarkMode ? 'sunny' : 'moon'"></ion-icon>
+      </button>
+
+      <!-- Notification Bell + Dropdown -->
+      <div class="notification-wrapper" style="position:relative; cursor:pointer" (click)="toggleNotifications($event)">
+        <ion-icon name="notifications" class="bell"></ion-icon>
+        <div class="notif-badge" *ngIf="(unreadCount$ | async)! > 0"
+          style="position:absolute; top:-4px; right:12px; background:#EB445A; color:white; border-radius:50%; width:16px; height:16px; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; pointer-events:none; border:2px solid white;">
+          {{ unreadCount$ | async }}</div>
+
+        <div class="notifications-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Notificaciones</span>
+            <button class="mark-read-btn" (click)="markAllRead()" *ngIf="notifications.length > 0">Marcar todas</button>
+          </div>
+          <div class="notifications-list" *ngIf="notifications.length > 0">
+            <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read"
+              (click)="markNotifAsRead(n)">
+              <div class="notif-dot" [class.read]="n.read"></div>
+              <div class="notif-body">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-text">{{ n.body }}</div>
+                <div class="notif-time">{{ getTimeAgo(n.date) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-notifs" *ngIf="notifications.length === 0">
+            <ion-icon name="notifications-off-outline"></ion-icon>
+            <div class="empty-title">Sin notificaciones</div>
+            <div class="empty-subtitle">No hay notificaciones pendientes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avatar + Profile Dropdown -->
+      <div class="avatar-wrapper" style="position:relative; cursor:pointer" (click)="toggleProfile($event)">
+        <img [src]="'https://ui-avatars.com/api/?name=' + userFullName + '&background=0b4756&color=fff'">
+
+        <div class="profile-fullscreen" *ngIf="showProfile" (click)="$event.stopPropagation()">
+          <div class="pf-header">
+            <ion-icon name="arrow-back-outline" class="pf-back"
+              (click)="closeDropdowns(); $event.stopPropagation()"></ion-icon>
+            <div class="pf-title">Perfil</div>
+            <div style="width: 24px;"></div>
+          </div>
+
+          <div class="pf-content">
+            <div class="pf-avatar-section">
+              <div class="pf-avatar-wrapper">
+                <div class="pf-avatar-circle">
+                  {{ userFullName ? userFullName.substring(0, 2).toUpperCase() : 'US' }}
+                </div>
+                <div class="pf-badge-shield"><ion-icon name="shield-checkmark-sharp"></ion-icon></div>
+              </div>
+              <div class="pf-name">{{ userFullName ? userFullName.split(' ')[0] : 'Usuario' }}</div>
+              <div class="pf-risk-pill">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                {{ userTestInterpretation || 'Riesgo Medio' | titlecase }}
+              </div>
+            </div>
+
+            <div class="pf-stats-row">
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">PUNTOS</span>
+                <span class="pf-stat-val">{{ progresoService.puntos_actuales }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">RETOS</span>
+                <span class="pf-stat-val">{{ progresoService.stats.retos_completados }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">INSIGNIAS</span>
+                <span class="pf-stat-val">{{ progresoService.insigniasObtenidas.length }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+            </div>
+
+            <div class="pf-activity-container">
+              <h3 class="pf-activity-title">Activity Overview</h3>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="location-sharp"></ion-icon></div>
+                <div class="pf-item-text">
+                  <div class="pf-lbl">Ubicación</div>
+                  <div class="pf-val">{{ userLocationName || 'Desconocida' }}</div>
+                </div>
+              </div>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="calendar-outline"></ion-icon></div>
+                <div class="pf-item-text pf-no-border">
+                  <div class="pf-lbl">Última Evaluación</div>
+                  <div class="pf-val">{{ userTestDate || 'No realizada' }}</div>
+                </div>
+                <ion-icon name="chevron-forward" class="pf-chevron"></ion-icon>
+              </div>
+            </div>
+
+            <div class="pf-tip-card">
+              <span class="pf-tip-lbl">TIP DEL DÍA</span>
+              <p class="pf-tip-desc">Mantén el ritmo, estás a 10 puntos de tu siguiente insignia.</p>
+              <ion-icon name="star" class="pf-tip-watermark"></ion-icon>
+            </div>
+
+            <button class="pf-btn-logout" (click)="cerrarSesion()">
+              <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Title -->
+  <div class="page-title">
+    <h1>Progreso</h1>
+    <p>Tu camino hacia el bienestar restaurativo.</p>
+  </div>
+
+  <!-- Weekly Progress Dark Card -->
+  <div class="weekly-progress">
+    <span class="wp-header">Progreso Semanal</span>
+    <div class="wp-stats">
+      <div class="wp-points">
+        <span class="wp-current">{{ progresoService.puntos_actuales }}</span>
+        <span class="wp-total">/ {{ progresoService.puntos_meta }} pts</span>
+      </div>
+      <div class="wp-percent">{{ (progresoService.progresoSemanal * 100).toFixed(0) }}% COMPLETADO</div>
+    </div>
+
+    <div class="wp-bar-container">
+      <div class="wp-bar-fill" [style.width]="(progresoService.progresoSemanal * 100) + '%'"></div>
+    </div>
+
+    <div class="wp-feedback">
+      <ion-icon name="trending-up"></ion-icon>
+      <span>¡Vas por buen camino, {{ userName }}!</span>
+    </div>
+  </div>
+
+  <!-- Monte Carlo Visualization Card -->
+  <div class="monte-carlo-card">
+    <div class="mc-header">
+      <div class="mc-title-row">
+        <ion-icon name="analytics-outline" class="mc-icon"></ion-icon>
+        <h3>Tu Posición en {{ userLocationName }}</h3>
+      </div>
+      <p class="mc-subtitle">Simulación Monte Carlo (n=10,000) · IARRI: {{ userIarri | number:'1.2-2' }} · {{
+        riesgoLabel }}</p>
+    </div>
+
+    <div class="mc-graph-container">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="mc-svg">
+        <defs>
+          <linearGradient id="mcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#88C7A1" stop-opacity="0.8" />
+            <stop offset="50%" stop-color="#E1B155" stop-opacity="0.8" />
+            <stop offset="100%" stop-color="#C0392B" stop-opacity="0.8" />
+          </linearGradient>
+          <linearGradient id="mcGradientFill" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0b4756" stop-opacity="0.4" />
+            <stop offset="100%" stop-color="#0b4756" stop-opacity="0.0" />
+          </linearGradient>
+        </defs>
+
+        <!-- Mean line (dashed, subtle) -->
+        <line [attr.x1]="cityMean * 100" y1="0" [attr.x2]="cityMean * 100" y2="100" stroke="#888" stroke-width="0.8"
+          stroke-dasharray="2,2" opacity="0.5" />
+
+        <!-- Distribution Curve -->
+        <path [attr.d]="monteCarloPath" fill="url(#mcGradientFill)" stroke="url(#mcGradient)" stroke-width="2"
+          stroke-linejoin="round" />
+
+        <!-- User Marker -->
+        <line [attr.x1]="userPositionX" y1="0" [attr.x2]="userPositionX" y2="100" class="mc-user-line" />
+        <circle [attr.cx]="userPositionX" [attr.cy]="100" r="3" class="mc-user-dot" />
+      </svg>
+      <div class="mc-user-label" [style.left]="'clamp(15%, ' + userPositionX + '%, 85%)'">Tú · {{ userIarri |
+        number:'1.2-2' }}</div>
+
+      <div class="mc-axis">
+        <span>Bajo (0)</span>
+        <span>μ={{ cityMean | number:'1.2-2' }}</span>
+        <span>Alto (1)</span>
+      </div>
+    </div>
+
+    <div class="mc-footer">
+      <div class="mc-stat">
+        <span class="mc-stat-val"><br>{{ (cityMean * 100) | number:'1.0-0' }}%</span>
+        <span class="mc-stat-lbl">Media Poblacional</span>
+      </div>
+      <div class="mc-stat">
+        <span class="mc-stat-val"><br>σ {{ (cityStdDev * 100) | number:'1.0-0' }}%</span>
+        <span class="mc-stat-lbl">Desv. Estándar</span>
+      </div>
+      <div class="mc-stat">
+        <span class="mc-stat-val highlight">P{{ userPercentile }}</span>
+        <span class="mc-stat-lbl">Tu Percentil</span>
+      </div>
+      <div class="mc-stat">
+        <span class="mc-stat-val highlight">{{ (userIarri * 100) | number:'1.0-0' }}%</span>
+        <span class="mc-stat-lbl">Tu IARRI</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tips de Entorno Section -->
+  <div class="section-header" style="margin-top: 20px;">
+    <h2>Tips de Entorno</h2>
+    <span style="font-size: 14px; color: var(--app-text-muted);">Desbloqueando al completar retos</span>
+  </div>
+
+  <div class="tips-container" style="padding: 0 20px 20px;">
+    <!-- Unlocked tips -->
+    <div class="tip-card" *ngFor="let tip of unlockedTips"
+      style="background: var(--app-surface); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid var(--app-border);">
+      <div class="tip-icon" [style.background]="'var(--ion-color-' + tip.color + ')'"
+        style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">
+        <ion-icon [name]="tip.icon || 'bulb'"></ion-icon>
+      </div>
+      <div class="tip-content" style="flex: 1;">
+        <h3 style="margin: 0 0 4px; font-size: 16px; font-weight: 700; color: var(--app-text);">{{ tip.title }}</h3>
+        <p style="margin: 0; font-size: 14px; color: var(--app-text-muted); line-height: 1.4;">{{ tip.desc }}</p>
+      </div>
+    </div>
+
+    <!-- Next locked tip -->
+    <div class="tip-card locked" *ngIf="nextLockedTip"
+      style="background: var(--app-background); border-radius: 16px; padding: 16px; margin-bottom: 12px; display: flex; align-items: center; gap: 16px; border: 1px dashed var(--app-border); opacity: 0.7;">
+      <div class="tip-icon bg-light"
+        style="width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--app-text-muted); background: rgba(0,0,0,0.05);">
+        <ion-icon name="lock-closed"></ion-icon>
+      </div>
+      <div class="tip-content" style="flex: 1;">
+        <h3 style="margin: 0 0 4px; font-size: 16px; font-weight: 600; color: var(--app-text-muted);">Próximo Tip</h3>
+        <p style="margin: 0; font-size: 13px; color: var(--app-text-muted);">Completa {{ nextLockedTip.reqRetos -
+          progresoService.stats.retos_completados }} reto(s) más para desbloquear.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Section -->
+  <div class="section-header">
+    <h2>Evaluación Educativa</h2>
+    <p style="font-size: 14px; color: var(--app-text-muted);">Demuestra lo aprendido y gana 50 pts</p>
+  </div>
+
+  <div class="quiz-promo-card" (click)="startQuiz()"
+    style="margin: 0 20px 20px; background: linear-gradient(135deg, #0b4756 0%, #1e6c7e 100%); border-radius: 20px; padding: 24px; color: white; display: flex; align-items: center; gap: 20px; cursor: pointer; position: relative; overflow: hidden; box-shadow: 0 10px 25px rgba(11,71,86,0.25);">
+    <div class="quiz-promo-icon" style="font-size: 40px; opacity: 0.9;">
+      <ion-icon name="ribbon-outline"></ion-icon>
+    </div>
+    <div class="quiz-promo-text">
+      <h3 style="margin: 0; font-size: 18px; font-weight: 700;">Quiz: Arquitectura y Metabolismo</h3>
+      <p style="margin: 4px 0 0; font-size: 14px; opacity: 0.8;">3 preguntas rápidas</p>
+    </div>
+    <ion-icon name="chevron-forward" style="margin-left: auto; font-size: 20px;"></ion-icon>
+    <div
+      style="position: absolute; bottom: -20px; right: -20px; font-size: 120px; opacity: 0.05; transform: rotate(-15deg);">
+      <ion-icon name="help-circle"></ion-icon>
+    </div>
+  </div>
+
+  <!-- Chart Card -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <span class="chart-title">Resumen de Puntuación</span>
+      <span class="chart-subtitle"><span class="dot"></span> ÚLTIMOS 7 DÍAS</span>
+    </div>
+
+    <div class="chart-bars">
+      <div class="bar-col" *ngFor="let d of chartDays">
+        <div class="bar-wrapper">
+          <div class="bar" [class.active]="d.isToday" [style.height]="d.height"></div>
+        </div>
+        <span class="day" [class.active]="d.isToday">{{ d.label }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section Header -->
+  <div class="section-header">
+    <h2>Insignias Ganadas</h2>
+    <a href="javascript:void(0)" class="view-all" (click)="toggleInsignias()">
+      {{ mostrarTodasInsignias ? 'Ver menos' : 'Ver todas >' }}
+    </a>
+  </div>
+
+  <!-- Badges Row -->
+  <div class="badges-grid">
+    <div class="badge-item"
+      *ngFor="let badge of (mostrarTodasInsignias ? progresoService.insigniasObtenidas : progresoService.insigniasObtenidas.slice(0, 3))">
+      <div class="badge-circle light-green">
+        <ion-icon [name]="badge.icon"></ion-icon>
+      </div>
+      <span class="badge-name">{{ badge.name }}</span>
+    </div>
+    <div *ngIf="progresoService.insigniasObtenidas.length === 0" class="empty-state">
+      <p>Aún no has obtenido insignias.</p>
+    </div>
+  </div>
+
+  <!-- QUIZ MODAL -->
+  <div class="modal-overlay" *ngIf="showQuizModal" (click)="closeQuiz()">
+    <div class="quiz-modal" (click)="$event.stopPropagation()">
+      <div class="quiz-header">
+        <span class="quiz-title">Quiz Metabólico</span>
+        <button class="close-quiz" (click)="closeQuiz()"><ion-icon name="close"></ion-icon></button>
+      </div>
+
+      <div class="quiz-body" *ngIf="!quizCompleted">
+        <div class="quiz-progress">
+          Pregunta {{ currentQuestionIndex + 1 }} de {{ quizQuestions.length }}
+        </div>
+        <div class="question-text">{{ quizQuestions[currentQuestionIndex].question }}</div>
+
+        <div class="options-list">
+          <button class="option-btn" *ngFor="let option of quizQuestions[currentQuestionIndex].options; let i = index"
+            (click)="handleAnswer(i)">
+            {{ option }}
+          </button>
+        </div>
+      </div>
+
+      <div class="quiz-results" *ngIf="quizCompleted">
+        <div class="result-icon" [class.success]="quizScore === quizQuestions.length">
+          <ion-icon [name]="quizScore === quizQuestions.length ? 'checkmark-circle' : 'alert-circle'"></ion-icon>
+        </div>
+        <h2 class="result-title">{{ quizScore === quizQuestions.length ? '¡Felicidades!' : 'Sigue aprendiendo' }}</h2>
+        <p class="result-score">Anotaste {{ quizScore }} / {{ quizQuestions.length }}</p>
+        <p class="result-msg" *ngIf="quizScore === quizQuestions.length">Has ganado 50 puntos y estás más cerca de
+          prevenir la resistencia a la insulina.</p>
+        <p class="result-msg" *ngIf="quizScore < quizQuestions.length">Repasa los tips de entorno y vuelve a intentarlo
+          para ganar los puntos.</p>
+
+        <button class="finish-quiz-btn" (click)="closeQuiz()">{{ quizScore === quizQuestions.length ? 'Cerrar' :
+          'Reintentar' }}</button>
+      </div>
+    </div>
+  </div>
+
+</ion-content>

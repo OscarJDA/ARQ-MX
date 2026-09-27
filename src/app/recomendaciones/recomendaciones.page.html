@@ -1,0 +1,493 @@
+<ion-content class="bg-tips" (click)="closeDropdowns()">
+
+  <!-- Backdrop when dropdown is open -->
+  <div class="dropdown-backdrop" *ngIf="showNotifications || showProfile" (click)="closeDropdowns()"></div>
+
+  <!-- Global Header -->
+  <div class="app-global-header">
+    <div class="brand-left">
+      <img src="assets/images/Logo.png" alt="ARQ-Metabolica MX" class="brand-logo">
+      <span class="brand-text">ARQ-Metabolica MX</span>
+    </div>
+    <div class="actions-right">
+      <button class="theme-toggle-btn" (click)="toggleTheme()" id="theme-toggle-recomendaciones">
+        <ion-icon [name]="isDarkMode ? 'sunny' : 'moon'"></ion-icon>
+      </button>
+
+      <!-- Notification Bell + Dropdown -->
+      <div class="notification-wrapper" style="position:relative; cursor:pointer" (click)="toggleNotifications($event)">
+        <ion-icon name="notifications" class="bell"></ion-icon>
+        <div class="notif-badge" *ngIf="(unreadCount$ | async)! > 0"
+          style="position:absolute; top:-4px; right:12px; background:#EB445A; color:white; border-radius:50%; width:16px; height:16px; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; pointer-events:none; border:2px solid white;">
+          {{ unreadCount$ | async }}</div>
+
+        <div class="notifications-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Notificaciones</span>
+            <button class="mark-read-btn" (click)="markAllRead()" *ngIf="notifications.length > 0">Marcar todas</button>
+          </div>
+          <div class="notifications-list" *ngIf="notifications.length > 0">
+            <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read"
+              (click)="markNotifAsRead(n)">
+              <div class="notif-dot" [class.read]="n.read"></div>
+              <div class="notif-body">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-text">{{ n.body }}</div>
+                <div class="notif-time">{{ getTimeAgo(n.date) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-notifs" *ngIf="notifications.length === 0">
+            <ion-icon name="notifications-off-outline"></ion-icon>
+            <div class="empty-title">Sin notificaciones</div>
+            <div class="empty-subtitle">No hay notificaciones pendientes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avatar + Profile Dropdown -->
+      <div class="avatar-wrapper" style="position:relative; cursor:pointer" (click)="toggleProfile($event)">
+        <img [src]="'https://ui-avatars.com/api/?name=' + userFullName + '&background=0F2E20&color=fff'">
+
+        <div class="profile-fullscreen" *ngIf="showProfile" (click)="$event.stopPropagation()">
+          <div class="pf-header">
+            <ion-icon name="arrow-back-outline" class="pf-back"
+              (click)="closeDropdowns(); $event.stopPropagation()"></ion-icon>
+            <div class="pf-title">Perfil</div>
+            <div style="width: 24px;"></div>
+          </div>
+
+          <div class="pf-content">
+            <div class="pf-avatar-section">
+              <div class="pf-avatar-wrapper">
+                <div class="pf-avatar-circle">
+                  {{ userFullName ? userFullName.substring(0, 2).toUpperCase() : 'US' }}
+                </div>
+                <div class="pf-badge-shield"><ion-icon name="shield-checkmark-sharp"></ion-icon></div>
+              </div>
+              <div class="pf-name">{{ userFullName ? userFullName.split(' ')[0] : 'Usuario' }}</div>
+              <div class="pf-risk-pill">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                {{ userTestInterpretation || 'Riesgo Medio' | titlecase }}
+              </div>
+            </div>
+
+            <div class="pf-stats-row">
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">PUNTOS</span>
+                <span class="pf-stat-val">{{ progresoService.puntos_actuales }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">RETOS</span>
+                <span class="pf-stat-val">{{ progresoService.stats.retos_completados }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">INSIGNIAS</span>
+                <span class="pf-stat-val">{{ progresoService.insigniasObtenidas.length }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+            </div>
+
+            <div class="pf-activity-container">
+              <h3 class="pf-activity-title">Activity Overview</h3>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="location-sharp"></ion-icon></div>
+                <div class="pf-item-text">
+                  <div class="pf-lbl">Ubicación</div>
+                  <div class="pf-val">{{ userLocationName || 'Desconocida' }}</div>
+                </div>
+              </div>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="calendar-outline"></ion-icon></div>
+                <div class="pf-item-text pf-no-border">
+                  <div class="pf-lbl">Última Evaluación</div>
+                  <div class="pf-val">{{ userTestDate || 'No realizada' }}</div>
+                </div>
+                <ion-icon name="chevron-forward" class="pf-chevron"></ion-icon>
+              </div>
+            </div>
+
+            <div class="pf-tip-card">
+              <span class="pf-tip-lbl">TIP DEL DÍA</span>
+              <p class="pf-tip-desc">Mantén el ritmo, estás a 10 puntos de tu siguiente insignia.</p>
+              <ion-icon name="star" class="pf-tip-watermark"></ion-icon>
+            </div>
+
+            <button class="pf-btn-logout" (click)="cerrarSesion()">
+              <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page Title -->
+  <div class="page-title-section">
+    <h1>Guía de Diseño</h1>
+    <p>Arquitectura Preventiva</p>
+  </div>
+
+  <!-- Tips List -->
+  <div class="tips-list">
+
+    <!-- Card 1: Main 'Editorial Wellness' -->
+    <div class="main-card">
+      <div class="pill-label">BIENESTAR EDITORIAL</div>
+      <div class="main-icon-wrap">
+        <ion-icon name="sparkles"></ion-icon>
+      </div>
+      <h2 class="card-title">Intervenciones Clave</h2>
+      <p class="card-desc">
+        Diseña tu espacio personal para reducir el riesgo metabólico ambiental. Pequeños ajustes en tu entorno inmediato
+        generan grandes impactos en tu salud biológica.
+      </p>
+    </div>
+
+
+
+    <!-- Recommendations Cards -->
+    <div class="rec-card-clean" *ngFor="let rec of recomendaciones; trackBy: trackByRecId" [class.locked]="rec.locked"
+      [class.priority-card]="rec.isPriority">
+
+      <!-- Priority Badge -->
+      <div class="priority-badge" *ngIf="rec.isPriority">
+        <ion-icon name="star"></ion-icon> PRIORIDAD PARA TU ZONA
+      </div>
+
+      <div class="rec-header">
+        <div class="rec-icon" [style.background]="rec.iconBg" [style.color]="rec.iconColor">
+          <ion-icon [name]="rec.locked ? 'lock-closed' : rec.icon"></ion-icon>
+        </div>
+        <div class="rec-title-wrap">
+          <h3 class="rec-title">{{ rec.title }}</h3>
+        </div>
+      </div>
+
+      <div class="rec-content">
+        <p class="rec-desc" *ngIf="!rec.locked">{{ rec.desc }}</p>
+        <p class="rec-desc lock-desc" *ngIf="rec.locked">Para desbloquear este Tip de Arquitectura Preventiva, debes
+          completar {{ rec.requiredRetos }} retos.</p>
+        <button class="btn-full-clean" [style.background]="rec.locked ? '#888' : rec.btnColor" [disabled]="rec.locked"
+          (click)="openMinigame(rec.id)">
+          {{ rec.locked ? 'BLOQUEADO' : (rec.btnText || 'VER GUÍA COMPLETA') }} <ion-icon *ngIf="!rec.locked"
+            name="arrow-forward"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Minijuego: El Método del Plato -->
+  <div class="modal-overlay minigame-overlay" *ngIf="showPlatoMinigame" (click)="closeMinigame()">
+    <div class="minigame-container" (click)="$event.stopPropagation()">
+      <div class="mg-header">
+        <h2>Arma tu Plato Ideal</h2>
+        <button class="mg-close" (click)="closeMinigame()"><ion-icon name="close"></ion-icon></button>
+      </div>
+
+      <div class="mg-body">
+        <p class="mg-instructions" *ngIf="!minigameCompleted">Selecciona un alimento y toca la sección correcta del
+          plato.</p>
+        <p class="mg-instructions success-text" *ngIf="minigameCompleted">¡Felicidades! Has completado el plato del buen
+          comer.</p>
+
+        <!-- Plato Interactivo -->
+        <div class="plate-wrapper">
+          <div class="plate">
+            <!-- Verduras 50% -->
+            <div class="plate-section section-verdura" (click)="placeFood('verdura')">
+              <span class="section-label">Verduras (50%)</span>
+              <div class="placed-items">
+                <span *ngFor="let item of plateSections.verdura" class="placed-icon">{{ item.icon }}</span>
+              </div>
+            </div>
+            <div class="plate-bottom-half">
+              <!-- Proteínas 25% -->
+              <div class="plate-section section-proteina" (click)="placeFood('proteina')">
+                <span class="section-label">Proteínas (25%)</span>
+                <div class="placed-items">
+                  <span *ngFor="let item of plateSections.proteina" class="placed-icon">{{ item.icon }}</span>
+                </div>
+              </div>
+              <!-- Carbohidratos 25% -->
+              <div class="plate-section section-carbohidrato" (click)="placeFood('carbohidrato')">
+                <span class="section-label">Carbohidratos (25%)</span>
+                <div class="placed-items">
+                  <span *ngFor="let item of plateSections.carbohidrato" class="placed-icon">{{ item.icon }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector de alimentos -->
+        <div class="food-selector" *ngIf="!minigameCompleted">
+          <div class="food-item" *ngFor="let food of foodsToPlace" [class.selected]="selectedFood?.id === food.id"
+            [class.placed]="food.placed" (click)="selectFood(food)">
+            <span class="food-icon">{{ food.icon }}</span>
+            <span class="food-name">{{ food.name }}</span>
+          </div>
+        </div>
+
+        <button class="btn-full-clean" style="margin-top:20px; background: #532E7E" *ngIf="minigameCompleted"
+          (click)="closeMinigame()">
+          CONTINUAR
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Minijuego: Rutina Express -->
+  <div class="modal-overlay minigame-overlay" *ngIf="showRutinaMinigame" (click)="closeRutina()">
+    <div class="minigame-container" (click)="$event.stopPropagation()">
+      <div class="mg-header" style="background: #8E441E;">
+        <h2>Rutina Express</h2>
+        <button class="mg-close" (click)="closeRutina()"><ion-icon name="close"></ion-icon></button>
+      </div>
+
+      <div class="mg-body rutina-body">
+
+        <ng-container *ngIf="!rutinaCompleted">
+          <div class="rutina-progress">
+            Ejercicio {{ currentExerciseIndex + 1 }} de {{ exercises.length }}
+          </div>
+
+          <div class="exercise-card">
+            <div class="exercise-icon-wrap">
+              <ion-icon [name]="exercises[currentExerciseIndex].icon"></ion-icon>
+            </div>
+            <h3 class="exercise-name">{{ exercises[currentExerciseIndex].name }}</h3>
+            
+            <div class="exercise-duration">
+              <ion-icon name="time-outline"></ion-icon>
+              <span>{{ timerValue }} seg</span>
+              <button class="play-timer-btn" *ngIf="!timerRunning && timerValue > 0" (click)="startTimer()">
+                <ion-icon name="play"></ion-icon>
+              </button>
+              <button class="play-timer-btn active" *ngIf="timerRunning" disabled>
+                <ion-icon name="hourglass-outline"></ion-icon>
+              </button>
+            </div>
+            
+            <p class="exercise-desc">{{ exercises[currentExerciseIndex].desc }}</p>
+          </div>
+
+          <button class="btn-full-clean"
+            style="margin-top:20px; background: #8E441E; width: 100%; justify-content: center;"
+            (click)="nextExercise()">
+            {{ currentExerciseIndex < exercises.length - 1 ? 'SIGUIENTE EJERCICIO' : 'FINALIZAR RUTINA' }} <ion-icon
+              name="checkmark"></ion-icon>
+          </button>
+        </ng-container>
+
+        <ng-container *ngIf="rutinaCompleted">
+          <div class="exercise-icon-wrap success-wrap">
+            <ion-icon name="trophy"></ion-icon>
+          </div>
+          <h3 class="exercise-name" style="color: #2dd36f; margin-top: 10px;">¡Rutina Completada!</h3>
+          <p class="exercise-desc text-center">Has ganado 30 puntos por mantener tu espacio activo.</p>
+          <button class="btn-full-clean"
+            style="margin-top:20px; background: #8E441E; width: 100%; justify-content: center;" (click)="closeRutina()">
+            CONTINUAR
+          </button>
+        </ng-container>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Caminata Recomendada Map -->
+  <div class="modal-overlay minigame-overlay" *ngIf="showMapModal" (click)="closeMapModal()">
+    <div class="minigame-container" (click)="$event.stopPropagation()">
+      <div class="mg-header" style="background: #1E408E;">
+        <h2>Caminata de 15 Minutos</h2>
+        <button class="mg-close" (click)="closeMapModal()"><ion-icon name="close"></ion-icon></button>
+      </div>
+      
+      <div class="mg-body" style="padding:0;">
+        <div id="walk-map-container" style="width: 100%; height: 350px;"></div>
+        
+        <div style="padding: 20px; text-align: center;">
+          <h3 style="margin: 0 0 10px; font-size: 18px; font-weight: 800; color: #333;">Circuito Sugerido</h3>
+          <p style="margin: 0 0 20px; font-size: 14px; color: #555;">Sigue esta ruta para despejar tu mente y mejorar tu metabolismo. ¡Disfruta el entorno!</p>
+          
+          <button class="btn-full-clean" style="background: #1E408E; width: 100%; justify-content: center;" (click)="closeMapModal()">
+            ENTENDIDO
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Recetario -->
+  <div class="modal-overlay minigame-overlay" *ngIf="showRecetarioModal" (click)="closeRecetario()">
+    <div class="minigame-container" (click)="$event.stopPropagation()">
+      <div class="mg-header" style="background: #D32F2F;">
+        <h2>Recetario Saludable</h2>
+        <button class="mg-close" (click)="closeRecetario()"><ion-icon name="close"></ion-icon></button>
+      </div>
+      
+      <div class="mg-body" style="padding: 0; max-height: 70vh; overflow-y: auto;">
+        
+        <!-- List of recipes -->
+        <div *ngIf="!selectedReceta" style="padding: 15px;">
+          <p style="font-size: 14px; color: #555; margin-top: 0; margin-bottom: 15px;">Selecciona una receta para ver sus detalles:</p>
+          <div class="receta-card" *ngFor="let receta of recetasList" (click)="selectReceta(receta)" 
+               style="background: #f9f9f9; border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div style="font-size: 30px;">{{ receta.icon }}</div>
+            <div>
+              <h3 style="margin: 0 0 4px; font-size: 16px; color: #333;">{{ receta.name }}</h3>
+              <p style="margin: 0; font-size: 12px; color: #777; display: flex; align-items: center; gap: 4px;">
+                <ion-icon name="time-outline"></ion-icon> {{ receta.time }} • <ion-icon name="flame-outline"></ion-icon> {{ receta.calories }}
+              </p>
+            </div>
+            <ion-icon name="chevron-forward" style="margin-left: auto; color: #ccc; font-size: 20px;"></ion-icon>
+          </div>
+        </div>
+
+        <!-- Recipe Detail -->
+        <div *ngIf="selectedReceta" style="padding: 20px;">
+          <button (click)="selectedReceta = null" style="background: none; border: none; color: #D32F2F; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 15px; cursor: pointer; padding: 0;">
+            <ion-icon name="arrow-back"></ion-icon> Volver al menú
+          </button>
+          
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 50px; margin-bottom: 10px;">{{ selectedReceta.icon }}</div>
+            <h2 style="margin: 0; color: #333; font-size: 22px; font-weight: 800;">{{ selectedReceta.name }}</h2>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 10px; color: #666; font-size: 13px; font-weight: 600;">
+              <span style="display: flex; align-items: center; gap: 4px;"><ion-icon name="time-outline"></ion-icon> {{ selectedReceta.time }}</span>
+              <span style="display: flex; align-items: center; gap: 4px;"><ion-icon name="flame-outline"></ion-icon> {{ selectedReceta.calories }}</span>
+            </div>
+          </div>
+
+          <h3 style="color: #D32F2F; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center; gap: 6px;">
+            <ion-icon name="restaurant"></ion-icon> Ingredientes
+          </h3>
+          <ul style="padding-left: 20px; color: #444; font-size: 14px; margin-bottom: 25px;">
+            <li *ngFor="let ing of selectedReceta.ingredients" style="margin-bottom: 8px;">{{ ing }}</li>
+          </ul>
+
+          <h3 style="color: #D32F2F; font-size: 16px; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; display: flex; align-items: center; gap: 6px;">
+            <ion-icon name="list"></ion-icon> Preparación
+          </h3>
+          <ol style="padding-left: 20px; color: #444; font-size: 14px; line-height: 1.5;">
+            <li *ngFor="let step of selectedReceta.steps" style="margin-bottom: 10px;">{{ step }}</li>
+          </ol>
+          
+          <button class="btn-full-clean" style="background: #D32F2F; width: 100%; justify-content: center; margin-top: 20px;" (click)="selectedReceta = null">
+            CERRAR RECETA
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Conceptos Importantes -->
+  <div class="modal-overlay minigame-overlay" *ngIf="showConceptosModal" (click)="closeConceptos()">
+    <div class="minigame-container" (click)="$event.stopPropagation()">
+      <div class="mg-header" style="background: #E65100;">
+        <h2>Conceptos Importantes</h2>
+        <button class="mg-close" (click)="closeConceptos()"><ion-icon name="close"></ion-icon></button>
+      </div>
+      
+      <div class="mg-body" style="padding: 0; max-height: 70vh; overflow-y: auto;">
+        
+        <div *ngIf="!selectedConcepto" style="padding: 15px;">
+          <p style="font-size: 14px; color: #555; margin-top: 0; margin-bottom: 15px;">Conoce más sobre la salud metabólica:</p>
+          <div class="receta-card" *ngFor="let concepto of conceptosList" (click)="selectConcepto(concepto)" 
+               style="background: #f9f9f9; border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; align-items: center; gap: 15px; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <div style="font-size: 30px; color: #E65100;"><ion-icon [name]="concepto.icon"></ion-icon></div>
+            <div>
+              <h3 style="margin: 0 0 4px; font-size: 16px; color: #333;">{{ concepto.title }}</h3>
+              <p style="margin: 0; font-size: 13px; color: #777;">{{ concepto.shortDesc }}</p>
+            </div>
+            <ion-icon name="chevron-forward" style="margin-left: auto; color: #ccc; font-size: 20px;"></ion-icon>
+          </div>
+        </div>
+
+        <div *ngIf="selectedConcepto" style="padding: 20px;">
+          <button (click)="selectedConcepto = null" style="background: none; border: none; color: #E65100; font-weight: bold; display: flex; align-items: center; gap: 5px; margin-bottom: 15px; cursor: pointer; padding: 0;">
+            <ion-icon name="arrow-back"></ion-icon> Volver al menú
+          </button>
+          
+          <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 50px; margin-bottom: 10px; color: #E65100;"><ion-icon [name]="selectedConcepto.icon"></ion-icon></div>
+            <h2 style="margin: 0; color: #333; font-size: 22px; font-weight: 800;">{{ selectedConcepto.title }}</h2>
+          </div>
+
+          <div style="background: #FFF3E0; border-radius: 12px; padding: 18px; margin-bottom: 20px; border-left: 4px solid #E65100;">
+            <p style="margin: 0; font-size: 15px; color: #444; line-height: 1.6;">{{ selectedConcepto.content }}</p>
+          </div>
+          
+          <button class="btn-full-clean" style="background: #E65100; width: 100%; justify-content: center; margin-top: 20px;" (click)="selectedConcepto = null">
+            ENTENDIDO
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Catchy Minigame -->
+  <div class="modal-overlay minigame-overlay" *ngIf="showCatchyModal" (click)="closeCatchy()">
+    <div class="minigame-container" style="background: #2D3748; padding: 0;" (click)="$event.stopPropagation()">
+      <div class="mg-header" style="background: #4A5568; border-bottom: none;">
+        <h2 style="color: white;">Atrapa lo Sano</h2>
+        <button class="mg-close" style="color: white;" (click)="closeCatchy()"><ion-icon name="close"></ion-icon></button>
+      </div>
+      
+      <div class="mg-body" style="padding: 0; display: flex; flex-direction: column; align-items: center; background: #2D3748;">
+        
+        <div style="width: 100%; display: flex; justify-content: space-between; padding: 15px 20px; background: #1A202C; color: white;">
+          <div style="font-size: 18px; font-weight: bold; display: flex; align-items: center; gap: 8px;">
+            <ion-icon name="star" style="color: #F6E05E;"></ion-icon> Puntaje: {{ catchyScore }} / 15
+          </div>
+        </div>
+
+        <div *ngIf="!catchyWon && !catchyGameOver" style="position: relative; width: 100%; height: 350px; background: #E2E8F0; overflow: hidden;">
+          <!-- Falling Items -->
+          <div *ngFor="let item of catchyItems" 
+               [style.left.%]="item.x" 
+               [style.top.%]="item.y" 
+               style="position: absolute; font-size: 35px; transform: translate(-50%, -50%); transition: top 0.05s linear;">
+            {{ item.icon }}
+          </div>
+
+          <!-- Player -->
+          <div [style.left.%]="catchyPlayerPos" 
+               style="position: absolute; bottom: 5%; font-size: 45px; transform: translateX(-50%); transition: left 0.1s ease-out; z-index: 10;">
+            🏃‍♂️
+          </div>
+        </div>
+
+        <div *ngIf="catchyWon" style="padding: 40px 20px; text-align: center; color: white; width: 100%;">
+          <ion-icon name="trophy" style="font-size: 70px; color: #F6E05E; margin-bottom: 20px;"></ion-icon>
+          <h2 style="margin: 0 0 10px; font-size: 26px;">¡Misión Cumplida!</h2>
+          <p style="margin: 0 0 30px; font-size: 16px; color: #A0AEC0; line-height: 1.5;">Evitaste los alimentos ultraprocesados y elegiste opciones saludables. ¡Gran trabajo!</p>
+          <button class="btn-full-clean" style="background: #48BB78; width: 100%; justify-content: center; height: 50px; font-size: 16px;" (click)="closeCatchy()">
+            ENTENDIDO
+          </button>
+        </div>
+
+        <!-- Controls -->
+        <div *ngIf="!catchyWon && !catchyGameOver" style="display: flex; justify-content: space-between; width: 100%; padding: 20px; background: #1A202C;">
+          <button (click)="moveCatchyPlayer('left')" style="width: 45%; height: 60px; border-radius: 12px; background: #4A5568; color: white; font-size: 30px; display: flex; align-items: center; justify-content: center; border: none; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <ion-icon name="arrow-back"></ion-icon>
+          </button>
+          <button (click)="moveCatchyPlayer('right')" style="width: 45%; height: 60px; border-radius: 12px; background: #4A5568; color: white; font-size: 30px; display: flex; align-items: center; justify-content: center; border: none; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+            <ion-icon name="arrow-forward"></ion-icon>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</ion-content>

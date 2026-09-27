@@ -1,0 +1,7 @@
+{
+  "name": "ARQ-Metabolica",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

@@ -1,0 +1,111 @@
+<ion-content class="auth-content">
+
+  <!-- ═══════════ BRANDING HEADER ═══════════ -->
+  <div class="auth-header">
+    <div class="auth-logo-wrap">
+      <img src="assets/images/Logo Blanco.png" alt="HealthScape Logo" class="auth-logo">
+    </div>
+    <h1 class="auth-app-name">ARQ-Metabólica MX</h1>
+    <p class="auth-tagline">Tu arquitectura metabólica, en tus manos.</p>
+  </div>
+
+  <!-- ═══════════ MODE TABS ═══════════ -->
+  <div class="auth-tabs">
+    <button class="auth-tab" [class.active]="mode === 'register'" (click)="mode = 'register'; errorMessage = ''">
+      Crear Cuenta
+    </button>
+    <button class="auth-tab" [class.active]="mode === 'login'" (click)="mode = 'login'; errorMessage = ''">
+      Iniciar Sesión
+    </button>
+    <div class="auth-tab-indicator" [class.right]="mode === 'login'"></div>
+  </div>
+
+  <!-- ═══════════ FORM CARD ═══════════ -->
+  <div class="auth-card slide-in" [class.login-mode]="mode === 'login'">
+
+    <h2 class="auth-card-title">
+      {{ mode === 'register' ? '¡Bienvenido!' : '¡Hola de nuevo!' }}
+    </h2>
+    <p class="auth-card-subtitle">
+      {{ mode === 'register' ? 'Crea tu cuenta para guardar tu progreso.' : 'Ingresa tus credenciales para continuar.'
+      }}
+    </p>
+
+    <!-- Email -->
+    <div class="auth-field">
+      <label class="auth-label">Correo electrónico</label>
+      <div class="auth-input-wrap">
+        <ion-icon name="mail-outline" class="auth-input-icon"></ion-icon>
+        <input id="auth-email" type="email" class="auth-input" [(ngModel)]="email" placeholder="ejemplo@mail.com"
+          autocomplete="email" (keyup.enter)="onSubmit()">
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="auth-field">
+      <label class="auth-label">Contraseña</label>
+      <div class="auth-input-wrap">
+        <ion-icon name="lock-closed-outline" class="auth-input-icon"></ion-icon>
+        <input id="auth-password" [type]="showPassword ? 'text' : 'password'" class="auth-input" [(ngModel)]="password"
+          placeholder="Mínimo 6 caracteres" (keyup.enter)="onSubmit()">
+        <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'" class="auth-input-toggle"
+          (click)="togglePasswordVisibility()"></ion-icon>
+      </div>
+    </div>
+
+    <!-- Confirm Password (only register) -->
+    <div class="auth-field" *ngIf="mode === 'register'">
+      <label class="auth-label">Confirmar contraseña</label>
+      <div class="auth-input-wrap">
+        <ion-icon name="shield-checkmark-outline" class="auth-input-icon"></ion-icon>
+        <input id="auth-password-confirm" [type]="showPasswordConfirm ? 'text' : 'password'" class="auth-input"
+          [(ngModel)]="passwordConfirm" placeholder="Repite la contraseña" (keyup.enter)="onSubmit()">
+        <ion-icon [name]="showPasswordConfirm ? 'eye-off-outline' : 'eye-outline'" class="auth-input-toggle"
+          (click)="togglePasswordConfirmVisibility()"></ion-icon>
+      </div>
+      <!-- Match indicator -->
+      <div class="password-match" *ngIf="passwordConfirm.length > 0">
+        <ion-icon [name]="password === passwordConfirm ? 'checkmark-circle' : 'close-circle'"
+          [class.match]="password === passwordConfirm" [class.no-match]="password !== passwordConfirm"></ion-icon>
+        <span [class.match]="password === passwordConfirm" [class.no-match]="password !== passwordConfirm">
+          {{ password === passwordConfirm ? 'Las contraseñas coinciden' : 'Las contraseñas no coinciden' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Error message -->
+    <div class="auth-error" *ngIf="errorMessage">
+      <ion-icon name="alert-circle"></ion-icon>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Submit button -->
+    <button id="auth-submit" class="auth-submit-btn" (click)="onSubmit()" [disabled]="isLoading">
+      <ion-spinner name="crescent" *ngIf="isLoading"></ion-spinner>
+      <span *ngIf="!isLoading">
+        <ion-icon [name]="mode === 'register' ? 'person-add-outline' : 'log-in-outline'"
+          style="margin-right: 8px; font-size: 20px;"></ion-icon>
+        {{ mode === 'register' ? 'CREAR CUENTA' : 'INICIAR SESIÓN' }}
+      </span>
+    </button>
+
+    <!-- Toggle link -->
+    <p class="auth-toggle-text">
+      {{ mode === 'register' ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?' }}
+      <span class="auth-toggle-link" (click)="toggleMode()">
+        {{ mode === 'register' ? 'Inicia sesión' : 'Crear una cuenta' }}
+      </span>
+    </p>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="auth-footer">
+    <p>Tus datos se guardan localmente en tu dispositivo.</p>
+    <p class="auth-footer-icon">
+      <ion-icon name="shield-checkmark-outline"></ion-icon>
+      Privacidad garantizada
+    </p>
+  </div>
+
+</ion-content>

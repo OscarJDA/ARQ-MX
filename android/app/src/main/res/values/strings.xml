@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">HealthScape</string>
+    <string name="title_activity_main">HealthScape</string>
+    <string name="package_name">com.healthscape.app</string>
+    <string name="custom_url_scheme">com.healthscape.app</string>
+</resources>

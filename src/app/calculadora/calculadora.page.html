@@ -1,0 +1,196 @@
+<ion-content class="bg-sim">
+  <!-- Custom Header -->
+  <div class="custom-header">
+    <div class="logo-title">
+      <ion-icon name="arrow-back-outline" class="back-btn" (click)="goBack()"></ion-icon>
+      <div class="title-text">
+        <span class="title-main">Planificador de Entorno</span>
+        <span class="title-sub">Simulador IARRI-MX</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sim-container">
+    <div class="sim-card">
+      <div class="sim-header" style="margin-bottom: 20px;">
+        <div class="sim-header-left">
+          <div class="sim-icon-wrap" style="width: 40px; height: 40px; font-size: 20px;">
+            <ion-icon name="options-outline"></ion-icon>
+          </div>
+          <div>
+            <h3 class="sim-title" style="font-size: 14px;">Calculadora Metabólica</h3>
+            <p class="sim-subtitle" style="font-size: 10px;">Ajusta las variables de tu entorno</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sim-body">
+        <!-- Current vs Projected gauges -->
+        <div class="sim-gauges">
+          <div class="sim-gauge-col">
+            <span class="sim-gauge-label">ACTUAL</span>
+            <div class="sim-gauge-circle" [ngClass]="getRiskColorClass(realIarri)">
+              <span class="sim-gauge-val">{{ realIarri | number:'1.2-2' }}</span>
+            </div>
+            <span class="sim-gauge-risk">{{ realRiesgo }}</span>
+          </div>
+          <div class="sim-arrow-col">
+            <ion-icon name="arrow-forward-outline" class="sim-arrow-icon"></ion-icon>
+          </div>
+          <div class="sim-gauge-col">
+            <span class="sim-gauge-label">PROYECTADO</span>
+            <div class="sim-gauge-circle" [ngClass]="getRiskColorClass(simIarri)">
+              <span class="sim-gauge-val">{{ simIarri | number:'1.2-2' }}</span>
+            </div>
+            <span class="sim-gauge-risk">{{ simRiesgo }}</span>
+          </div>
+        </div>
+
+        <!-- Delta indicator -->
+        <div class="sim-delta" *ngIf="simDelta !== 0">
+          <ion-icon [name]="simDelta > 0 ? 'trending-down-outline' : 'trending-up-outline'"></ion-icon>
+          <span [class.positive]="simDelta > 0" [class.negative]="simDelta < 0">
+            {{ simDelta > 0 ? '−' : '+' }}{{ (simDelta > 0 ? simDelta : -simDelta) * 100 | number:'1.1-1' }}% riesgo
+          </span>
+        </div>
+
+        <!-- Sliders -->
+        <div class="sim-sliders">
+          <!-- AV - Áreas Verdes -->
+          <div class="sim-slider-item">
+            <div class="sim-slider-header">
+              <div class="sim-slider-label">
+                <ion-icon name="leaf-outline" class="sl-icon green"></ion-icon>
+                <span>Áreas Verdes (AV)</span>
+              </div>
+              <div class="sim-slider-val-group">
+                <input type="number" class="sim-input green" min="0" max="100" step="1"
+                  [value]="(simAV * 100) | number:'1.0-0'"
+                  (change)="onSimInputChange('simAV', $any($event.target).valueAsNumber)">
+                <span class="sim-slider-pct">%</span>
+              </div>
+            </div>
+            <div class="sim-slider-meta">
+              <span class="sim-weight">Peso: α = 0.20</span>
+              <span class="sim-direction">↑ Reduce riesgo</span>
+            </div>
+            <input type="range" class="sim-range green" min="0" max="100" [value]="simAV * 100"
+              (input)="simAV = $any($event.target).value / 100; onSimSliderChange()">
+            <div class="sim-slider-bar-bg">
+              <div class="sim-slider-bar green" [style.width]="(simAV * 100) + '%'"></div>
+              <div class="sim-real-marker" [style.left]="(realAV * 100) + '%'" title="Valor actual"></div>
+            </div>
+          </div>
+
+          <!-- IC - Caminabilidad -->
+          <div class="sim-slider-item">
+            <div class="sim-slider-header">
+              <div class="sim-slider-label">
+                <ion-icon name="walk-outline" class="sl-icon blue"></ion-icon>
+                <span>Caminabilidad (IC)</span>
+              </div>
+              <div class="sim-slider-val-group">
+                <input type="number" class="sim-input blue" min="0" max="100" step="1"
+                  [value]="(simIC * 100) | number:'1.0-0'"
+                  (change)="onSimInputChange('simIC', $any($event.target).valueAsNumber)">
+                <span class="sim-slider-pct">%</span>
+              </div>
+            </div>
+            <div class="sim-slider-meta">
+              <span class="sim-weight">Peso: β = 0.25</span>
+              <span class="sim-direction">↑ Reduce riesgo</span>
+            </div>
+            <input type="range" class="sim-range blue" min="0" max="100" [value]="simIC * 100"
+              (input)="simIC = $any($event.target).value / 100; onSimSliderChange()">
+            <div class="sim-slider-bar-bg">
+              <div class="sim-slider-bar blue" [style.width]="(simIC * 100) + '%'"></div>
+              <div class="sim-real-marker" [style.left]="(realIC * 100) + '%'" title="Valor actual"></div>
+            </div>
+          </div>
+
+          <!-- ED - Equipamiento Deportivo -->
+          <div class="sim-slider-item">
+            <div class="sim-slider-header">
+              <div class="sim-slider-label">
+                <ion-icon name="barbell-outline" class="sl-icon orange"></ion-icon>
+                <span>Equip. Deportivo (ED)</span>
+              </div>
+              <div class="sim-slider-val-group">
+                <input type="number" class="sim-input orange" min="0" max="100" step="1"
+                  [value]="(simED * 100) | number:'1.0-0'"
+                  (change)="onSimInputChange('simED', $any($event.target).valueAsNumber)">
+                <span class="sim-slider-pct">%</span>
+              </div>
+            </div>
+            <div class="sim-slider-meta">
+              <span class="sim-weight">Peso: γ = 0.15</span>
+              <span class="sim-direction">↑ Reduce riesgo</span>
+            </div>
+            <input type="range" class="sim-range orange" min="0" max="100" [value]="simED * 100"
+              (input)="simED = $any($event.target).value / 100; onSimSliderChange()">
+            <div class="sim-slider-bar-bg">
+              <div class="sim-slider-bar orange" [style.width]="(simED * 100) + '%'"></div>
+              <div class="sim-real-marker" [style.left]="(realED * 100) + '%'" title="Valor actual"></div>
+            </div>
+          </div>
+
+          <!-- EAR - Entorno Alimentario -->
+          <div class="sim-slider-item">
+            <div class="sim-slider-header">
+              <div class="sim-slider-label">
+                <ion-icon name="fast-food-outline" class="sl-icon red"></ion-icon>
+                <span>Ent. Alimentario (EAR)</span>
+              </div>
+              <div class="sim-slider-val-group">
+                <input type="number" class="sim-input red" min="0" max="100" step="1"
+                  [value]="(simEAR * 100) | number:'1.0-0'"
+                  (change)="onSimInputChange('simEAR', $any($event.target).valueAsNumber)">
+                <span class="sim-slider-pct">%</span>
+              </div>
+            </div>
+            <div class="sim-slider-meta">
+              <span class="sim-weight">Peso: δ = 0.25</span>
+              <span class="sim-direction danger">↑ Aumenta riesgo</span>
+            </div>
+            <input type="range" class="sim-range red" min="0" max="100" [value]="simEAR * 100"
+              (input)="simEAR = $any($event.target).value / 100; onSimSliderChange()">
+            <div class="sim-slider-bar-bg">
+              <div class="sim-slider-bar red" [style.width]="(simEAR * 100) + '%'"></div>
+              <div class="sim-real-marker" [style.left]="(realEAR * 100) + '%'" title="Valor actual"></div>
+            </div>
+          </div>
+
+          <!-- IM - Índice de Marginación -->
+          <div class="sim-slider-item">
+            <div class="sim-slider-header">
+              <div class="sim-slider-label">
+                <ion-icon name="business-outline" class="sl-icon purple"></ion-icon>
+                <span>Marginación (IM)</span>
+              </div>
+              <div class="sim-slider-val-group">
+                <input type="number" class="sim-input purple" min="0" max="100" step="1"
+                  [value]="(simIM * 100) | number:'1.0-0'"
+                  (change)="onSimInputChange('simIM', $any($event.target).valueAsNumber)">
+                <span class="sim-slider-pct">%</span>
+              </div>
+            </div>
+            <div class="sim-slider-meta">
+              <span class="sim-weight">Peso: ε = 0.15</span>
+              <span class="sim-direction danger">↑ Aumenta riesgo</span>
+            </div>
+            <input type="range" class="sim-range purple" min="0" max="100" [value]="simIM * 100"
+              (input)="simIM = $any($event.target).value / 100; onSimSliderChange()">
+            <div class="sim-slider-bar-bg">
+              <div class="sim-slider-bar purple" [style.width]="(simIM * 100) + '%'"></div>
+              <div class="sim-real-marker" [style.left]="(realIM * 100) + '%'" title="Valor actual"></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="sim-reset-btn" (click)="resetSimulation()">
+          <ion-icon name="refresh-outline"></ion-icon> Restaurar Valores Reales
+        </button>
+      </div>
+    </div>
+  </div>
+</ion-content>

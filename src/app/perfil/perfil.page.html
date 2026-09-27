@@ -1,0 +1,365 @@
+<ion-content class="bg-offwhite" (click)="closeDropdowns()">
+
+  <!-- Backdrop when dropdown is open -->
+  <div class="dropdown-backdrop" *ngIf="showNotifications || showProfile" (click)="closeDropdowns()"></div>
+
+  <!-- Global Header -->
+  <div class="app-global-header">
+    <div class="brand-left">
+      <img src="assets/images/Logo.png" alt="ARQ-Metabolica MX" class="brand-logo">
+      <span class="brand-text">ARQ-Metabolica MX</span>
+    </div>
+    <div class="actions-right">
+      <button class="theme-toggle-btn" (click)="toggleTheme()" id="theme-toggle">
+        <ion-icon [name]="isDarkMode ? 'sunny' : 'moon'"></ion-icon>
+      </button>
+
+      <!-- Notification Bell + Dropdown -->
+      <div class="notification-wrapper" style="position:relative; cursor:pointer" (click)="toggleNotifications($event)">
+        <ion-icon name="notifications" class="bell"></ion-icon>
+        <div class="notif-badge" *ngIf="(unreadCount$ | async)! > 0"
+          style="position:absolute; top:-4px; right:12px; background:#EB445A; color:white; border-radius:50%; width:16px; height:16px; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; pointer-events:none; border:2px solid white;">
+          {{ unreadCount$ | async }}</div>
+
+        <!-- Notifications Dropdown -->
+        <div class="notifications-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Notificaciones</span>
+            <button class="mark-read-btn" (click)="markAllRead()" *ngIf="notifications.length > 0">Marcar todas</button>
+          </div>
+          <div class="notifications-list" *ngIf="notifications.length > 0">
+            <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read"
+              (click)="markNotifAsRead(n)">
+              <div class="notif-dot" [class.read]="n.read"></div>
+              <div class="notif-body">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-text">{{ n.body }}</div>
+                <div class="notif-time">{{ getTimeAgo(n.date) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-notifs" *ngIf="notifications.length === 0">
+            <ion-icon name="notifications-off-outline"></ion-icon>
+            <div class="empty-title">Sin notificaciones</div>
+            <div class="empty-subtitle">No hay notificaciones pendientes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avatar + Profile Dropdown -->
+      <div class="avatar-wrapper" style="position:relative; cursor:pointer" (click)="toggleProfile($event)">
+        <img
+          [src]="progresoService.userProfileImage || ('https://ui-avatars.com/api/?name=' + userFullName + '&background=02485a&color=fff')"
+          style="object-fit: cover;">
+
+        <!-- Profile Dropdown -->
+        <div class="profile-fullscreen" *ngIf="showProfile" (click)="$event.stopPropagation()">
+          <div class="pf-header">
+            <ion-icon name="arrow-back-outline" class="pf-back"
+              (click)="closeDropdowns(); $event.stopPropagation()"></ion-icon>
+            <div class="pf-title">Perfil</div>
+            <div style="width: 24px;"></div>
+          </div>
+
+          <div class="pf-content">
+            <div class="pf-avatar-section">
+              <div class="pf-avatar-wrapper" (click)="pickProfileImage()" style="cursor:pointer; position:relative;">
+                <img *ngIf="progresoService.userProfileImage" [src]="progresoService.userProfileImage"
+                  class="pf-avatar-circle" style="object-fit:cover; width:80px; height:80px;">
+                <div *ngIf="!progresoService.userProfileImage" class="pf-avatar-circle">
+                  {{ userFullName ? userFullName.substring(0, 2).toUpperCase() : 'US' }}
+                </div>
+                <div class="pf-badge-shield"><ion-icon name="camera" style="font-size:12px;"></ion-icon></div>
+              </div>
+              <div class="pf-name">{{ userFullName ? userFullName.split(' ')[0] : 'Usuario' }}</div>
+              <div class="pf-risk-pill">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                {{ userTestInterpretation || 'Riesgo Medio' | titlecase }}
+              </div>
+            </div>
+
+            <div class="pf-stats-row">
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">PUNTOS</span>
+                <span class="pf-stat-val">{{ progresoService.puntos_actuales }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">RETOS</span>
+                <span class="pf-stat-val">{{ progresoService.stats.retos_completados }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">INSIGNIAS</span>
+                <span class="pf-stat-val">{{ progresoService.insigniasObtenidas.length }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+            </div>
+
+            <div class="pf-activity-container">
+              <h3 class="pf-activity-title">Activity Overview</h3>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="location-sharp"></ion-icon></div>
+                <div class="pf-item-text">
+                  <div class="pf-lbl">Ubicación</div>
+                  <div class="pf-val">{{ userLocationName || 'Desconocida' }}</div>
+                </div>
+              </div>
+
+              <div class="pf-activity-item" (click)="verResultadosQuiz()" style="cursor: pointer;">
+                <div class="pf-icon-wrap"><ion-icon name="calendar-outline"></ion-icon></div>
+                <div class="pf-item-text pf-no-border">
+                  <div class="pf-lbl">Última Evaluación</div>
+                  <div class="pf-val">{{ userTestDate || 'No realizada' }}</div>
+                </div>
+                <ion-icon name="chevron-forward" class="pf-chevron"></ion-icon>
+              </div>
+            </div>
+
+            <div class="pf-tip-card">
+              <span class="pf-tip-lbl">TIP DEL DÍA</span>
+              <p class="pf-tip-desc">Mantén el ritmo, estás a 10 puntos de tu siguiente insignia.</p>
+              <ion-icon name="star" class="pf-tip-watermark"></ion-icon>
+            </div>
+
+            <button class="pf-btn-logout" (click)="cerrarSesion()">
+              <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Greeting -->
+  <div class="greeting-section ion-padding-horizontal">
+    <h1 class="greeting-title" style="display: flex; align-items: center; gap: 8px;">
+      Hola, {{ userName }}
+      <ion-icon *ngIf="personalRiskLevel === 'medium'" name="warning" style="color: #ffc409; font-size: 24px;" title="Riesgo Metabólico Moderado"></ion-icon>
+      <ion-icon *ngIf="personalRiskLevel === 'high'" name="warning" style="color: #eb445a; font-size: 24px;" title="Alto Riesgo Metabólico"></ion-icon>
+    </h1>
+    <div class="location-badge clickable" (click)="getUserLocation()" title="Actualizar ubicación">
+      <ion-icon [name]="isLoadingMetrics ? 'sync-outline' : 'location'" class="loc-icon"
+        [class.spinning]="isLoadingMetrics">
+      </ion-icon>
+      <span class="loc-text">{{ userLocationName }}</span>
+      <ion-icon name="refresh-outline" class="refresh-icon" *ngIf="!isLoadingMetrics"></ion-icon>
+    </div>
+  </div>
+
+  <!-- Main IARM Card -->
+  <div class="main-card-container ion-padding-horizontal">
+    <div class="main-card">
+      <div class="card-header">
+        <div class="card-titles">
+          <span class="subtitle">ARQ-METABÓLICA MX</span>
+          <h2 class="title">Índice de Riesgo Metabólico<br>Arquitectónico (IARRI)</h2>
+        </div>
+        <div class="card-icon clickable" (click)="recenterMap()" style="cursor: pointer;" title="Centrar a ubicación actual">
+          <ion-icon name="compass-outline"></ion-icon>
+        </div>
+      </div>
+
+      <!-- Premium Gauge -->
+      <div class="gauge-container">
+        <svg viewBox="0 0 100 55" class="gauge-svg">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#88C7A1" />
+              <stop offset="50%" stop-color="#E1B155" />
+              <stop offset="100%" stop-color="#C0392B" />
+            </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Faint background track -->
+          <path d="M 6 50 A 44 44 0 0 1 94 50" fill="none" class="gauge-bg" stroke-width="5" stroke-linecap="round" />
+
+          <!-- Colored track -->
+          <path d="M 6 50 A 44 44 0 0 1 94 50" fill="none" stroke="url(#gaugeGrad)" class="gauge-fill" stroke-width="5"
+            stroke-linecap="round" [style.stroke-dasharray]="(iarm * 138.23) + ', 138.23'" filter="url(#glow)" />
+        </svg>
+
+        <div class="gauge-center">
+          <span class="gauge-value" [class.loading-pulse]="isLoadingMetrics">{{ iarm | number:'1.2-2' }}</span>
+          <div class="gauge-badge" [ngClass]="riesgoColor ? 'badge-' + riesgoColor : 'badge-warning'">
+            {{ riesgoLabel || 'RIESGO MEDIO' | uppercase }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="metrics-list">
+        <div class="metric-item">
+          <div class="metric-top">
+            <span class="metric-name">
+              <ion-icon name="walk-outline" class="metric-icon"></ion-icon>
+              Caminabilidad
+            </span>
+            <span class="metric-val">
+              <span *ngIf="isLoadingMetrics && caminabilidad === 0" class="loading-dots">...</span>
+              <span *ngIf="!isLoadingMetrics || caminabilidad > 0">{{ displayCaminabilidad | number:'1.0-0' }}%</span>
+            </span>
+          </div>
+          <div class="metric-bar-bg">
+            <div class="metric-bar-fill walkability" [style.width]="displayCaminabilidad + '%'"></div>
+          </div>
+        </div>
+
+        <div class="metric-item">
+          <div class="metric-top">
+            <span class="metric-name">
+              <ion-icon name="git-network-outline" class="metric-icon"></ion-icon>
+              Conectividad
+            </span>
+            <span class="metric-val">
+              <span *ngIf="isLoadingMetrics && conectividad === 0" class="loading-dots">...</span>
+              <span *ngIf="!isLoadingMetrics || conectividad > 0">{{ displayConectividad | number:'1.0-0' }}%</span>
+            </span>
+          </div>
+          <div class="metric-bar-bg">
+            <div class="metric-bar-fill connectivity" [style.width]="displayConectividad + '%'"></div>
+          </div>
+        </div>
+
+        <div class="metric-item">
+          <div class="metric-top">
+            <span class="metric-name">
+              <ion-icon name="leaf-outline" class="metric-icon"></ion-icon>
+              Áreas Verdes
+            </span>
+            <span class="metric-val">
+              <span *ngIf="isLoadingMetrics && areasVerdes === 0" class="loading-dots">...</span>
+              <span *ngIf="!isLoadingMetrics || areasVerdes > 0">{{ displayAreasVerdes | number:'1.0-0' }}%</span>
+            </span>
+          </div>
+          <div class="metric-bar-bg">
+            <div class="metric-bar-fill green-areas" [style.width]="displayAreasVerdes + '%'"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="card-action">
+        <ion-button expand="block" class="btn-primary" routerLink="/perfil-ambiental">
+          VER DIAGNÓSTICO AMBIENTAL
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Environmental Tip and Health Sensor Info -->
+  <div class="tip-card-container ion-padding-horizontal">
+    <div class="tip-card" style="margin-bottom: 15px;" *ngIf="walkabilityImpact">
+      <div class="tip-icon-wrapper" style="background: rgba(33,150,243,0.1); color: #2196f3;">
+        <ion-icon name="analytics-outline"></ion-icon>
+      </div>
+      <div class="tip-text-box">
+        <span class="tip-title">IMPACTO METABÓLICO URBANO</span>
+        <p class="tip-desc">{{ walkabilityImpact }}</p>
+      </div>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon-wrapper">
+        <ion-icon name="cloud-outline"></ion-icon>
+      </div>
+      <div class="tip-text-box">
+        <span class="tip-title">CALIDAD DEL AIRE (AQI: {{ aqi }})</span>
+        <p class="tip-desc">{{ environmentalTip }}</p>
+      </div>
+    </div>
+    <div class="tip-card" style="margin-top: 15px;">
+      <div class="tip-icon-wrapper" style="background: rgba(46,125,50,0.1); color: #2e7d32;">
+        <ion-icon name="footsteps-outline"></ion-icon>
+      </div>
+      <div class="tip-text-box">
+        <span class="tip-title">ACTIVIDAD FÍSICA (HealthKit)</span>
+        <p class="tip-desc">Pasos registrados hoy: <strong>{{ dailySteps | number }}</strong>.</p>
+      </div>
+    </div>
+
+    <!-- Weather Card Rediseñada (Consistente con la App) -->
+    <div style="background: #F0F4F8; border-radius: 20px; padding: 20px; margin-top: 15px; position: relative; min-height: 80px;">
+      
+      <!-- Loading shimmer -->
+      <div class="weather-shimmer" *ngIf="isLoadingWeather && !weatherData" style="width: 100%;">
+        <div class="shimmer-line shimmer-lg" style="height: 15px; width: 60%; background: rgba(0,0,0,0.05); margin-bottom: 8px; border-radius: 8px; animation: shimmerLoad 1.5s infinite linear;"></div>
+        <div class="shimmer-line shimmer-sm" style="height: 12px; width: 40%; background: rgba(0,0,0,0.05); border-radius: 8px; animation: shimmerLoad 1.5s infinite linear;"></div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; width: 100%; gap: 15px;" *ngIf="weatherData">
+        
+        <!-- Top row: Icon, Temp/Cond, Pills -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <!-- Icon -->
+            <div style="background: #FFFFFF; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+              <ion-icon [name]="getWeatherIcon()" style="color: #042D15; font-size: 2.2rem;"></ion-icon>
+            </div>
+            
+            <!-- Info -->
+            <div style="display: flex; flex-direction: column;">
+              <span style="font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 800; color: #042D15; line-height: 1; letter-spacing: -1px;">
+                {{ weatherData.temp | number:'1.0-0' }}°C
+              </span>
+              <span style="font-size: 0.9rem; font-weight: 600; color: #1B6535; margin-top: 4px;">
+                {{ weatherData.condition | titlecase }}
+              </span>
+            </div>
+          </div>
+          
+          <!-- Metrics -->
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #1B6535; background: #FFFFFF; padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <ion-icon name="water-outline" style="font-size: 0.9rem;"></ion-icon> {{ weatherData.precipitation }}mm
+            </div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: #1B6535; background: #FFFFFF; padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+              <ion-icon name="sunny-outline" style="font-size: 0.9rem;"></ion-icon> UV {{ weatherData.uv_index | number:'1.0-1' }}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Advice row -->
+        <div style="display: flex; align-items: flex-start; gap: 8px;">
+          <ion-icon [name]="getAdviceIcon()" style="color: #f39c12; font-size: 1.2rem; margin-top: 2px; flex-shrink: 0;"></ion-icon>
+          <p style="margin: 0; font-size: 0.95rem; color: #111; line-height: 1.4; font-weight: 400;">
+            {{ getWeatherAdvice() }}
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Challenges / Tus Retos -->
+  <div class="challenges-section">
+    <div class="section-header">
+      <h2 class="section-title">Tus Retos</h2>
+      <a class="section-link" routerLink="/tabs/challenges">VER TODOS</a>
+    </div>
+
+    <div class="challenges-scroll" *ngIf="ultimosRetos && ultimosRetos.length > 0">
+      <div class="challenge-card" *ngFor="let reto of ultimosRetos" routerLink="/tabs/challenges">
+        <div class="challenge-icon" [ngClass]="'icon-' + (reto.icon || 'leaf')" [style.color]="!['leaf', 'walk'].includes(reto.icon) ? 'var(--ion-color-' + (reto.color || 'success') + ')' : null">
+          <ion-icon [name]="reto.icon || 'leaf'"></ion-icon>
+        </div>
+        <div class="challenge-info">
+          <h3>{{ reto.title }}</h3>
+          <p>{{ (reto.desc && reto.desc.length > 30) ? (reto.desc | slice:0:30) + '...' : reto.desc }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="!ultimosRetos || ultimosRetos.length === 0" style="padding: 20px; text-align: center; color: #888; font-size: 0.9rem;">
+      No hay retos disponibles en este momento.
+    </div>
+  </div>
+
+</ion-content>

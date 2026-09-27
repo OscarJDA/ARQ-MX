@@ -1,0 +1,151 @@
+<ion-content [class.dark-theme]="isDarkMode">
+
+  <!-- Header Unificado -->
+  <div class="app-global-header no-border">
+    <div class="brand-left">
+      <img src="assets/images/Logo.png" alt="ARQ-Metabolica MX" class="brand-logo">
+      <span class="brand-text">ARQ-Metabolica MX</span>
+    </div>
+    <div class="actions-right">
+      <ion-button fill="clear" (click)="goBack()" class="close-report-btn">
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+
+  <div class="report-container" *ngIf="!isLoading">
+    
+    <div class="report-title-section">
+      <h1 class="report-main-title">Diagnóstico Ambiental</h1>
+      <p class="report-subtitle">Perfil Metabólico • {{ locationName }}</p>
+    </div>
+
+    <!-- Premium IARRI Gauge -->
+    <div class="score-card">
+      <div class="gauge-container">
+        <svg viewBox="0 0 100 55" class="gauge-svg">
+          <defs>
+            <linearGradient id="gaugeGradReport" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#88C7A1" />
+              <stop offset="50%" stop-color="#E1B155" />
+              <stop offset="100%" stop-color="#C0392B" />
+            </linearGradient>
+            <filter id="glowReport" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
+          </defs>
+
+          <!-- Faint background track -->
+          <path d="M 6 50 A 44 44 0 0 1 94 50" fill="none" class="gauge-bg" stroke-width="5" stroke-linecap="round" />
+
+          <!-- Colored track -->
+          <path d="M 6 50 A 44 44 0 0 1 94 50" fill="none" stroke="url(#gaugeGradReport)" class="gauge-fill" stroke-width="5"
+            stroke-linecap="round" [style.stroke-dasharray]="(iarriScore * 138.23) + ', 138.23'" filter="url(#glowReport)" />
+        </svg>
+
+        <div class="gauge-center">
+          <span class="gauge-value">{{ iarriScore | number:'1.2-2' }}</span>
+          <div class="gauge-badge" [ngClass]="riskLabel === 'RIESGO BAJO' ? 'badge-success' : riskLabel === 'RIESGO MEDIO' ? 'badge-warning' : 'badge-danger'">
+            {{ riskLabel }}
+          </div>
+        </div>
+      </div>
+      <p class="score-desc">
+        Riesgo de Resistencia a la Insulina inducido por el entorno.
+      </p>
+    </div>
+
+    <!-- Metrics Breakdown -->
+    <div class="section-title">Análisis de Variables</div>
+    
+    <div class="metrics-grid">
+      <!-- AV -->
+      <div class="metric-item">
+        <div class="m-icon av"><ion-icon name="leaf"></ion-icon></div>
+        <div class="m-info">
+          <div class="m-label">Áreas Verdes (AV)</div>
+          <p class="m-description">Mide el acceso a parques y zonas arboladas que mitigan el estrés térmico y mental.</p>
+          <div class="m-bar-bg">
+            <div class="m-bar-fill" [style.width]="(av * 100) + '%'" [ngClass]="getSeverityClass(av, true)"></div>
+          </div>
+        </div>
+        <div class="m-val">{{ (av * 100) | number:'1.0-0' }}%</div>
+      </div>
+
+      <!-- IC -->
+      <div class="metric-item">
+        <div class="m-icon ic"><ion-icon name="walk"></ion-icon></div>
+        <div class="m-info">
+          <div class="m-label">Caminabilidad (IC)</div>
+          <p class="m-description">Grado en que el trazado urbano facilitan el transporte activo a pie de forma segura.</p>
+          <div class="m-bar-bg">
+            <div class="m-bar-fill" [style.width]="(ic * 100) + '%'" [ngClass]="getSeverityClass(ic, true)"></div>
+          </div>
+        </div>
+        <div class="m-val">{{ (ic * 100) | number:'1.0-0' }}%</div>
+      </div>
+
+      <!-- ED -->
+      <div class="metric-item">
+        <div class="m-icon ed"><ion-icon name="barbell"></ion-icon></div>
+        <div class="m-info">
+          <div class="m-label">Equipamiento Activo (ED)</div>
+          <p class="m-description">Cercanía a instalaciones deportivas públicas o privadas en un radio de 1km.</p>
+          <div class="m-bar-bg">
+            <div class="m-bar-fill" [style.width]="(ed * 100) + '%'" [ngClass]="getSeverityClass(ed, true)"></div>
+          </div>
+        </div>
+        <div class="m-val">{{ (ed * 100) | number:'1.0-0' }}%</div>
+      </div>
+
+      <!-- EAR -->
+      <div class="metric-item">
+        <div class="m-icon ear"><ion-icon name="fast-food"></ion-icon></div>
+        <div class="m-info">
+          <div class="m-label">Entorno Alimentario (EAR)</div>
+          <p class="m-description">Prevalencia de comercios de comida ultraprocesada sobre mercados de frescos.</p>
+          <div class="m-bar-bg">
+            <div class="m-bar-fill" [style.width]="(ear * 100) + '%'" [ngClass]="getSeverityClass(ear)"></div>
+          </div>
+        </div>
+        <div class="m-val">{{ (ear * 100) | number:'1.0-0' }}%</div>
+      </div>
+
+      <!-- IM -->
+      <div class="metric-item">
+        <div class="m-icon im"><ion-icon name="alert-circle"></ion-icon></div>
+        <div class="m-info">
+          <div class="m-label">Índice de Marginación (IM)</div>
+          <p class="m-description">Indicador de carencias estructurales basado en datos de CONAPO e INEGI.</p>
+          <div class="m-bar-bg">
+            <div class="m-bar-fill" [style.width]="(im * 100) + '%'" [ngClass]="getSeverityClass(im)"></div>
+          </div>
+        </div>
+        <div class="m-val">{{ (im * 100) | number:'1.0-0' }}%</div>
+      </div>
+    </div>
+
+    <!-- Interpretation -->
+    <div class="interpretation-card">
+      <h3>Resumen del Diagnóstico</h3>
+      <p>{{ getImpactMessage() }}</p>
+      <div class="action-box">
+        <ion-icon name="information-circle"></ion-icon>
+        <span>Validado mediante correlaciones ENSANUT.</span>
+      </div>
+    </div>
+
+    <ion-button expand="block" mode="ios" class="btn-share" (click)="goBack()">
+      VOLVER AL INICIO
+    </ion-button>
+
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Analizando datos territoriales...</p>
+    <span class="loading-subtitle">Esto puede tardar unos segundos</span>
+  </div>
+</ion-content>

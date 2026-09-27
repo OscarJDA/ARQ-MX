@@ -1,0 +1,269 @@
+<ion-content class="bg-retos" (click)="closeDropdowns()">
+
+  <!-- Backdrop when dropdown is open -->
+  <div class="dropdown-backdrop" *ngIf="showNotifications || showProfile" (click)="closeDropdowns()"></div>
+
+  <!-- Global Header -->
+  <div class="app-global-header">
+    <div class="brand-left">
+      <img src="assets/images/Logo.png" alt="ARQ-Metabolica MX" class="brand-logo">
+      <span class="brand-text">ARQ-Metabolica MX</span>
+    </div>
+    <div class="actions-right">
+      <button class="theme-toggle-btn" (click)="toggleTheme()" id="theme-toggle-retos">
+        <ion-icon [name]="isDarkMode ? 'sunny' : 'moon'"></ion-icon>
+      </button>
+
+      <!-- Notification Bell + Dropdown -->
+      <div class="notification-wrapper" style="position:relative; cursor:pointer" (click)="toggleNotifications($event)">
+        <ion-icon name="notifications" class="bell"></ion-icon>
+        <div class="notif-badge" *ngIf="(unreadCount$ | async)! > 0"
+          style="position:absolute; top:-4px; right:12px; background:#EB445A; color:white; border-radius:50%; width:16px; height:16px; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; pointer-events:none; border:2px solid white;">
+          {{ unreadCount$ | async }}</div>
+
+        <div class="notifications-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Notificaciones</span>
+            <button class="mark-read-btn" (click)="markAllRead()" *ngIf="notifications.length > 0">Marcar todas</button>
+          </div>
+          <div class="notifications-list" *ngIf="notifications.length > 0">
+            <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read"
+              (click)="markNotifAsRead(n)">
+              <div class="notif-dot" [class.read]="n.read"></div>
+              <div class="notif-body">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-text">{{ n.body }}</div>
+                <div class="notif-time">{{ getTimeAgo(n.date) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-notifs" *ngIf="notifications.length === 0">
+            <ion-icon name="notifications-off-outline"></ion-icon>
+            <div class="empty-title">Sin notificaciones</div>
+            <div class="empty-subtitle">No hay notificaciones pendientes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avatar + Profile Dropdown -->
+      <div class="avatar-wrapper" style="position:relative; cursor:pointer" (click)="toggleProfile($event)">
+        <img [src]="'https://ui-avatars.com/api/?name=' + userFullName + '&background=02485a&color=fff'">
+
+        <div class="profile-fullscreen" *ngIf="showProfile" (click)="$event.stopPropagation()">
+          <div class="pf-header">
+            <ion-icon name="arrow-back-outline" class="pf-back" (click)="closeDropdowns(); $event.stopPropagation()"></ion-icon>
+            <div class="pf-title">Perfil</div>
+            <div style="width: 24px;"></div>
+          </div>
+
+          <div class="pf-content">
+            <div class="pf-avatar-section">
+              <div class="pf-avatar-wrapper">
+                <div class="pf-avatar-circle">
+                  {{ userFullName ? userFullName.substring(0, 2).toUpperCase() : 'US' }}
+                </div>
+                <div class="pf-badge-shield"><ion-icon name="shield-checkmark-sharp"></ion-icon></div>
+              </div>
+              <div class="pf-name">{{ userFullName ? userFullName.split(' ')[0] : 'Usuario' }}</div>
+              <div class="pf-risk-pill">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                {{ userTestInterpretation || 'Riesgo Medio' | titlecase }}
+              </div>
+            </div>
+
+            <div class="pf-stats-row">
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">PUNTOS</span>
+                <span class="pf-stat-val">{{ progresoService.puntos_actuales }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">RETOS</span>
+                <span class="pf-stat-val">{{ progresoService.stats.retos_completados }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">INSIGNIAS</span>
+                <span class="pf-stat-val">{{ progresoService.insigniasObtenidas.length }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+            </div>
+
+            <div class="pf-activity-container">
+              <h3 class="pf-activity-title">Activity Overview</h3>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="location-sharp"></ion-icon></div>
+                <div class="pf-item-text">
+                  <div class="pf-lbl">Ubicación</div>
+                  <div class="pf-val">{{ userLocationName || 'Desconocida' }}</div>
+                </div>
+              </div>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="calendar-outline"></ion-icon></div>
+                <div class="pf-item-text pf-no-border">
+                  <div class="pf-lbl">Última Evaluación</div>
+                  <div class="pf-val">{{ userTestDate || 'No realizada' }}</div>
+                </div>
+                <ion-icon name="chevron-forward" class="pf-chevron"></ion-icon>
+              </div>
+            </div>
+
+            <div class="pf-tip-card">
+              <span class="pf-tip-lbl">TIP DEL DÍA</span>
+              <p class="pf-tip-desc">Mantén el ritmo, estás a 10 puntos de tu siguiente insignia.</p>
+              <ion-icon name="star" class="pf-tip-watermark"></ion-icon>
+            </div>
+
+            <button class="pf-btn-logout" (click)="cerrarSesion()">
+              <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Progress Card -->
+  <div class="progress-card">
+    <div class="status-label">ESTADO SEMANAL</div>
+    <div class="progress-row">
+      <div class="progress-text">
+        <h2>Progreso</h2>
+        <h2>Semanal</h2>
+      </div>
+      <div class="progress-stats">
+        <span class="current">{{ puntos_actuales }}</span>
+        <span class="slash">/</span>
+        <span class="total">{{ puntos_meta }} pts</span>
+      </div>
+    </div>
+    <div class="progress-bar-container">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" [style.width]="(progresoSemanal * 100) + '%'"></div>
+      </div>
+    </div>
+    <div class="progress-desc">
+      Estás a <strong>{{ puntosFaltantes }} puntos</strong> de alcanzar tu meta de regeneración metabólica
+      esta semana.
+    </div>
+  </div>
+
+  <!-- Earned Badges -->
+  <div class="section-header">
+    <h2>Insignias Obtenidas</h2>
+    <a href="javascript:void(0)" class="view-all" (click)="toggleInsignias()">
+      {{ mostrarTodasInsignias ? 'Ver menos' : 'Ver todas' }}
+    </a>
+  </div>
+
+  <div class="badges-grid">
+    <div class="badge-card" *ngFor="let badge of (mostrarTodasInsignias ? insignias : insignias.slice(0, 3))"
+      [class.earned]="badge.earned" (click)="openBadgeModal(badge)">
+      <div class="badge-icon-wrap" [class.earned-icon]="badge.earned">
+        <ion-icon [name]="badge.icon"></ion-icon>
+      </div>
+      <div class="badge-label">{{ badge.name | uppercase }}</div>
+    </div>
+  </div>
+
+  <!-- AI Button -->
+  <div class="ai-challenge-container">
+    <div class="ai-button-card" (click)="generarRetoDinamico()" [class.disabled]="isGeneratingAI">
+      <div class="ai-icon-bg">
+        <ion-icon name="sparkles"></ion-icon>
+      </div>
+      <div class="ai-btn-text">
+        <div class="ai-title">{{ isGeneratingAI ? 'GENERANDO...' : 'GENERAR RETO CON IA' }}</div>
+        <div class="ai-subtitle">CONTEXTUALIZADO A TU ENTORNO REAL</div>
+      </div>
+      <ion-icon name="chevron-forward" class="ai-arrow"></ion-icon>
+    </div>
+  </div>
+
+  <!-- Misiones Disponibles -->
+  <div class="section-header">
+    <h2>Misiones Disponibles</h2>
+  </div>
+
+  <div class="missions-list">
+    <div class="mission-card" *ngFor="let reto of retosFiltrados" [class.completed]="reto.completed">
+      <!-- Geofence badge -->
+      <div class="geofence-badge" *ngIf="reto.geofence_triggered">
+        <ion-icon name="navigate-outline"></ion-icon>
+        <span>GEOCERCA</span>
+      </div>
+      <div class="mission-icon-wrap">
+        <ion-icon [name]="reto.icon"></ion-icon>
+      </div>
+      <div class="mission-content">
+        <h3 class="mission-title" [class.strike]="reto.completed">{{ reto.title }}</h3>
+        <p class="mission-desc">{{ reto.desc }}</p>
+
+        <div class="mission-mid-section">
+          <!-- Reason for metabolic benefit -->
+          <div class="mission-reason" *ngIf="reto.reason">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            <span>{{ reto.reason }}</span>
+          </div>
+          <div class="mission-action" *ngIf="!reto.completed">
+            <button class="btn-iniciar" (click)="iniciarReto(reto)" [disabled]="reto.en_progreso">
+              {{ reto.en_progreso ? 'EN PRO' : 'INICIAR' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- POI distance -->
+        <div class="mission-poi" *ngIf="reto.poi_name">
+          <div class="poi-left">
+            <ion-icon name="location-outline"></ion-icon>
+            <span class="poi-name">{{ reto.poi_name }}</span>
+          </div>
+          <div class="poi-right" *ngIf="reto.poi_distance_m">
+            <span class="dash">-</span>
+            <span class="dist">~{{ reto.poi_distance_m }}m</span>
+          </div>
+        </div>
+
+        <div class="mission-pts-pill">
+          <ion-icon name="add"></ion-icon> {{ reto.points }} PTS
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="retosFiltrados.length === 0" class="empty-state">
+      <p>No hay misiones disp.</p>
+    </div>
+  </div>
+
+  <!-- Modal for Badges -->
+  <ion-modal [isOpen]="isBadgeModalOpen" (didDismiss)="closeBadgeModal()" initialBreakpoint="0.6"
+    [breakpoints]="[0, 0.6]" handle="true">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <ion-toolbar>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeBadgeModal()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding ion-text-center card-modal">
+        <div *ngIf="selectedBadge">
+          <div class="modal-icon-circle" [style.background]="selectedBadge.earned ? '#DED1F0' : '#E8E8E8'">
+            <ion-icon [name]="selectedBadge.icon" [style.color]="selectedBadge.earned ? '#8438E8' : '#999'"
+              style="font-size: 60px;"></ion-icon>
+          </div>
+          <h2 class="modal-title">{{ selectedBadge.name }}</h2>
+          <ion-badge [color]="selectedBadge.earned ? 'success' : 'medium'" class="ion-margin-bottom custom-badge-label">
+            {{ selectedBadge.earned ? 'DESBLOQUEADA' : 'BLOQUEADA' }}
+          </ion-badge>
+          <p class="modal-desc">
+            {{ selectedBadge.desc }}
+          </p>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

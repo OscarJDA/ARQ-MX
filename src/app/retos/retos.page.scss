@@ -1,0 +1,658 @@
+ion-content.bg-retos {
+  --background: #FBFAF6;
+  transition: --background 0.3s ease;
+}
+
+$dark-green: #0A3222;
+$text-dark: #1A1A1A;
+$text-muted: #666666;
+
+.custom-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+
+  .logo-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: $dark-green;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+      img {
+        width: 20px;
+        height: auto;
+      }
+    }
+
+    .title-text {
+      display: flex;
+      flex-direction: column;
+
+      .title-main,
+      .title-sub {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: $text-dark;
+        line-height: 1.1;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .bell-icon {
+      font-size: 22px;
+      color: $text-dark;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  }
+}
+
+.progress-card {
+  margin: 10px 20px 20px;
+  background: #F4F3ED;
+  border-radius: 20px;
+  padding: 24px;
+  transition: background-color 0.3s ease;
+
+  .status-label {
+    font-size: 0.70rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #4A4A4A;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    transition: color 0.3s ease;
+  }
+
+  .progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 15px;
+
+    .progress-text {
+      h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 500;
+        color: $text-dark;
+        line-height: 1.15;
+        transition: color 0.3s ease;
+      }
+    }
+
+    .progress-stats {
+      margin-bottom: 4px;
+
+      .current {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: $text-dark;
+        transition: color 0.3s ease;
+      }
+
+      .slash {
+        font-size: 1rem;
+        color: $text-dark;
+        margin: 0 2px;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .total {
+        font-size: 0.95rem;
+        color: #797979;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+    }
+  }
+
+  .progress-bar-container {
+    margin-bottom: 20px;
+
+    .progress-bar-track {
+      background: #E0DFDB;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      transition: background-color 0.3s ease;
+
+      .progress-bar-fill {
+        background: $dark-green;
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.4s ease;
+      }
+    }
+  }
+
+  .progress-desc {
+    font-size: 0.85rem;
+    color: #4A4A4A;
+    line-height: 1.5;
+    transition: color 0.3s ease;
+
+    strong {
+      color: $text-dark;
+      font-weight: 700;
+      transition: color 0.3s ease;
+    }
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  margin: 30px 0 15px;
+
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin: 0;
+    transition: color 0.3s ease;
+  }
+
+  .view-all {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $text-dark;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 12px;
+  padding: 0 20px;
+  margin-bottom: 30px;
+  justify-items: center;
+
+  .badge-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+    .badge-icon-wrap {
+      width: 100%;
+      aspect-ratio: 1;
+      max-height: 100px;
+      background: #F4F3ED;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+
+      ion-icon {
+        font-size: 38px;
+        color: #A3A3A3;
+      }
+
+      &.earned-icon {
+        background: #F1E8FA;
+
+        ion-icon {
+          color: #8C4AF2;
+        }
+      }
+    }
+
+    .badge-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: $text-dark;
+      text-align: center;
+      line-height: 1.25;
+      letter-spacing: 0.2px;
+      transition: color 0.3s ease;
+    }
+  }
+}
+
+.ai-challenge-container {
+  padding: 0 20px;
+  margin-bottom: 40px;
+
+  .ai-button-card {
+    background: $dark-green;
+    border-radius: 35px;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 10px 20px rgba(10, 50, 34, 0.2);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+    .ai-icon-bg {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      ion-icon {
+        color: white;
+        font-size: 22px;
+      }
+    }
+
+    .ai-btn-text {
+      flex: 1;
+
+      .ai-title {
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      .ai-subtitle {
+        color: rgba(255, 255, 255, 0.65);
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 1px;
+      }
+    }
+
+    .ai-arrow {
+      color: white;
+      font-size: 20px;
+    }
+
+    &.disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+  }
+}
+
+.missions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 20px 80px;
+
+  .mission-card {
+    background: #F4F5F1;
+    border-radius: 28px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    transition: background-color 0.3s ease;
+    position: relative;
+    flex-wrap: wrap;
+
+    .geofence-badge {
+      position: absolute;
+      top: -8px;
+      right: 16px;
+      background: linear-gradient(135deg, #2196F3, #00BCD4);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 3px 8px rgba(33, 150, 243, 0.35);
+      animation: geofencePulse 2s ease-in-out infinite;
+
+      ion-icon {
+        font-size: 10px;
+      }
+    }
+
+    .mission-icon-wrap {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #E5EFE9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background-color 0.3s ease;
+
+      ion-icon {
+        font-size: 24px;
+        color: $dark-green;
+        transition: color 0.3s ease;
+      }
+    }
+
+    .mission-content {
+      flex: 1;
+
+      .mission-title {
+        margin: 0 0 6px 0;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: $text-dark;
+        transition: color 0.3s ease;
+
+        &.strike {
+          text-decoration: line-through;
+          color: $text-muted;
+        }
+      }
+
+      .mission-desc {
+        margin: 0 0 8px 0;
+        font-size: 0.85rem;
+        color: #5A5A5A;
+        line-height: 1.35;
+        transition: color 0.3s ease;
+      }
+
+      .mission-mid-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+
+        .mission-reason {
+          flex: 1;
+          margin: 0;
+          font-size: 0.78rem;
+          color: #1B5E20;
+          line-height: 1.3;
+          display: flex;
+          align-items: flex-start;
+          gap: 6px;
+          background: #EAF2EC;
+          padding: 10px 12px;
+          border-radius: 12px;
+          border-left: 3px solid #4CAF50;
+
+          ion-icon {
+            font-size: 16px;
+            margin-top: 1px;
+            flex-shrink: 0;
+            color: #4CAF50;
+          }
+
+          span {
+            font-weight: 500;
+          }
+        }
+
+        .mission-action {
+          flex-shrink: 0;
+          .btn-iniciar {
+            background: $dark-green;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 24px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            transition: background-color 0.3s ease;
+          }
+        }
+      }
+
+      .mission-poi {
+        margin: 0 0 12px 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 24px;
+        font-size: 0.8rem;
+
+        .poi-left {
+          display: flex;
+          align-items: flex-start;
+          gap: 6px;
+          color: #1565C0;
+          font-weight: 600;
+          max-width: 120px;
+
+          ion-icon {
+            font-size: 14px;
+            color: #1976D2;
+            margin-top: 2px;
+            flex-shrink: 0;
+          }
+
+          .poi-name {
+            line-height: 1.2;
+          }
+        }
+
+        .poi-right {
+          display: flex;
+          flex-direction: column;
+          color: #666;
+          font-weight: 400;
+          font-size: 0.75rem;
+
+          .dash {
+            line-height: 1;
+          }
+          .dist {
+            line-height: 1.2;
+          }
+        }
+      }
+
+      .mission-pts-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        background: #CCEBDA;
+        color: $dark-green;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.70rem;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+
+        ion-icon {
+          font-size: 12px;
+          font-weight: bold;
+        }
+      }
+    }
+
+    &.completed {
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes geofencePulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.85; }
+  }
+
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.card-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 20px;
+
+  .modal-icon-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  }
+
+  .modal-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 10px 0;
+  }
+
+  .custom-badge-label {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+
+  .modal-desc {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-top: 15px;
+    padding: 0 10px;
+  }
+}
+
+/* ===== DARK MODE OVERRIDES ===== */
+:host-context(body.dark-theme) {
+
+  ion-content.bg-retos {
+    --background: #1E1E1E;
+  }
+
+  .progress-card {
+    background: #2A2A2A;
+
+    .status-label { color: #8A8A8A; }
+
+    .progress-row {
+      .progress-text h2 { color: #E0E0E0; }
+      .progress-stats {
+        .current { color: #E0E0E0; }
+        .slash { color: #A0A0A0; }
+        .total { color: #8A8A8A; }
+      }
+    }
+
+    .progress-bar-container .progress-bar-track {
+      background: #3A3A3A;
+      .progress-bar-fill { background: #4CAF7D; }
+    }
+
+    .progress-desc {
+      color: #A0A0A0;
+      strong { color: #E0E0E0; }
+    }
+  }
+
+  .section-header {
+    h2 { color: #E0E0E0; }
+    .view-all { color: #A0A0A0; }
+  }
+
+  .badges-grid .badge-card {
+    .badge-icon-wrap {
+      background: #333333;
+      ion-icon { color: #7A7A7A; }
+
+      &.earned-icon {
+        background: #2D1F44;
+        ion-icon { color: #B380FF; }
+      }
+    }
+    .badge-label { color: #D0D0D0; }
+  }
+
+  .ai-challenge-container .ai-button-card {
+    background: #2D6B4A;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .missions-list .mission-card {
+    background: #2A2A2A;
+
+    .geofence-badge {
+      background: linear-gradient(135deg, #1565C0, #00838F);
+      box-shadow: 0 3px 8px rgba(21, 101, 192, 0.4);
+    }
+
+    .mission-icon-wrap {
+      background: #1F3B28;
+      ion-icon { color: #6FCF8D; }
+    }
+
+    .mission-content {
+      .mission-title { color: #E0E0E0; }
+      .mission-desc { color: #A0A0A0; }
+
+      .mission-mid-section {
+        .mission-reason {
+          color: #81C784;
+          background: rgba(76, 175, 80, 0.1);
+          border-left-color: #66BB6A;
+
+          ion-icon { color: #66BB6A; }
+        }
+
+        .mission-action .btn-iniciar {
+          background: #2D6B4A;
+        }
+      }
+
+      .mission-poi {
+        .poi-left {
+          color: #64B5F6;
+          ion-icon { color: #42A5F5; }
+        }
+        .poi-right {
+          color: #9E9E9E;
+        }
+      }
+
+      .mission-pts-pill {
+        background: #1F3B28;
+        color: #6FCF8D;
+      }
+    }
+  }
+
+  .empty-state { color: #8A8A8A; }
+
+  .card-modal {
+    .modal-title { color: #E0E0E0; }
+    .modal-desc { color: #A0A0A0; }
+  }
+}

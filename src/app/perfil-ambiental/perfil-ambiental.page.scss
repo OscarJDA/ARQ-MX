@@ -1,0 +1,343 @@
+$primary: #0F2E20;
+$light-bg: #FBFAF6;
+$text-dark: #1A1D1C;
+$text-muted: #6C7570;
+
+ion-content {
+  --background: #{$light-bg};
+}
+
+/* Global Header Unificado */
+.app-global-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: white;
+  transition: all 0.3s ease;
+
+  &.no-border {
+    border-bottom: none;
+  }
+
+  .brand-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .brand-text {
+      font-size: 14px;
+      font-weight: 800;
+      color: $primary;
+      letter-spacing: -0.2px;
+      text-transform: uppercase;
+    }
+  }
+
+  .actions-right {
+    .close-report-btn {
+      --padding-start: 10px;
+      --padding-end: 10px;
+      font-size: 24px;
+      color: $text-muted;
+    }
+  }
+}
+
+.report-container {
+  padding: 0 24px 40px;
+}
+
+.report-title-section {
+  padding: 20px 0;
+  
+  .report-main-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    color: $primary;
+    letter-spacing: -0.5px;
+  }
+
+  .report-subtitle {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: $text-muted;
+    font-weight: 600;
+  }
+}
+
+.score-card {
+  background: white;
+  border-radius: 32px;
+  padding: 30px 20px;
+  margin-bottom: 24px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+  
+  .gauge-container {
+    position: relative;
+    width: 220px;
+    margin: 0 auto 30px;
+
+    .gauge-svg {
+      width: 100%;
+      display: block;
+      overflow: visible;
+
+      .gauge-bg {
+        stroke: #F0F1F0;
+        transition: stroke 0.3s ease;
+      }
+
+      .gauge-fill {
+        transition: stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+    }
+
+    .gauge-center {
+      position: absolute;
+      bottom: -15px;
+      left: 0;
+      top: 30px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+
+      .gauge-value {
+        font-family: 'Outfit', sans-serif;
+        font-size: 3.2rem;
+        font-weight: 800;
+        color: $primary;
+        line-height: 1;
+        margin-bottom: 12px;
+        letter-spacing: -2px;
+        transition: color 0.3s ease;
+      }
+
+      .gauge-badge {
+        font-size: 0.65rem;
+        font-weight: 800;
+        padding: 6px 14px;
+        border-radius: 14px;
+        letter-spacing: 1px;
+        transition: background-color 0.3s ease, color 0.3s ease;
+
+        &.badge-success {
+          background-color: #EAF7ED;
+          color: #287A4F;
+        }
+
+        &.badge-warning {
+          background-color: #FFF4E5;
+          color: #B26A00;
+        }
+
+        &.badge-danger {
+          background-color: #FCE8E6;
+          color: #C0392B;
+        }
+      }
+    }
+  }
+  
+  .score-desc {
+    font-size: 12px;
+    color: $text-muted;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0 20px;
+  }
+}
+
+.section-title {
+  margin: 16px 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: $text-dark;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metrics-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  
+  .metric-item {
+    background: white;
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    
+    .m-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      
+      &.av { background: #E9F5ED; color: #2E6F40; }
+      &.ic { background: #E9EEFC; color: #1E408E; }
+      &.ed { background: #FCEFE9; color: #8E441E; }
+      &.ear { background: #F6E9F5; color: #7E2E72; }
+      &.im { background: #F5E9E9; color: #8E1E1E; }
+    }
+    
+    .m-info {
+      flex: 1;
+      
+      .m-label {
+        font-size: 14px;
+        font-weight: 800;
+        color: $text-dark;
+        margin-bottom: 4px;
+      }
+
+      .m-description {
+        font-size: 12px;
+        color: $text-muted;
+        line-height: 1.4;
+        margin: 0 0 12px 0;
+      }
+      
+      .m-bar-bg {
+        height: 8px;
+        background: #F0F2ED;
+        border-radius: 4px;
+        overflow: hidden;
+        
+        .m-bar-fill {
+          height: 100%;
+          border-radius: 4px;
+          transition: width 1s ease;
+          
+          &.sev-low { background: #2dd36f; }
+          &.sev-med { background: #ffc409; }
+          &.sev-high { background: #eb445a; }
+        }
+      }
+    }
+    
+    .m-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: $text-dark;
+      padding-top: 2px;
+    }
+  }
+}
+
+.interpretation-card {
+  background: $primary;
+  border-radius: 28px;
+  padding: 24px;
+  margin-top: 32px;
+  color: white;
+  box-shadow: 0 10px 25px rgba(15, 46, 32, 0.2);
+  
+  h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+  
+  p {
+    margin: 0 0 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    opacity: 0.9;
+  }
+  
+  .action-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    ion-icon { font-size: 16px; }
+  }
+}
+
+.btn-share {
+  margin-top: 32px;
+  --background: #{$primary};
+  --border-radius: 20px;
+  font-weight: 800;
+  height: 56px;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+}
+
+.loading-state {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  text-align: center;
+  padding: 0 40px;
+  
+  ion-spinner {
+    --color: #{$primary};
+    width: 60px;
+    height: 60px;
+    margin-bottom: 24px;
+  }
+  
+  p {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 8px;
+    color: $text-dark;
+  }
+
+  .loading-subtitle {
+    font-size: 13px;
+    opacity: 0.7;
+  }
+}
+
+/* Dark Mode Support */
+.dark-theme {
+  --background: #121212;
+  
+  .app-global-header, .score-card, .metric-item {
+    background: #1E1E1E;
+    color: white;
+  }
+  
+  .m-label, .m-description, .m-val, .gauge-value, .report-main-title, .report-subtitle, .section-title, .loading-state p {
+    color: white !important;
+  }
+  
+  .score-desc { color: rgba(255, 255, 255, 0.7); }
+  
+  .m-bar-bg { background: #333; }
+  .gauge-container .gauge-svg .gauge-bg { stroke: #333; }
+  
+  .gauge-container .gauge-center .gauge-badge {
+    &.badge-success { background-color: #1F3B28; color: #6FCF8D; }
+    &.badge-warning { background-color: #3B3020; color: #E5B045; }
+    &.badge-danger { background-color: #3B2020; color: #E57373; }
+  }
+}

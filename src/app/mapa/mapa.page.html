@@ -1,0 +1,232 @@
+<ion-content class="cream-bg" (click)="closeDropdowns()">
+
+  <!-- Backdrop when dropdown is open -->
+  <div class="dropdown-backdrop" *ngIf="showNotifications || showProfile" (click)="closeDropdowns()"></div>
+
+  <!-- Global Header -->
+  <div class="app-global-header">
+    <div class="brand-left">
+      <img src="assets/images/Logo.png" alt="ARQ-Metabolica MX" class="brand-logo">
+      <span class="brand-text">ARQ-Metabolica MX</span>
+    </div>
+    <div class="actions-right">
+      <button class="theme-toggle-btn" (click)="toggleTheme()" id="theme-toggle-mapa">
+        <ion-icon [name]="isDarkMode ? 'sunny' : 'moon'"></ion-icon>
+      </button>
+
+      <!-- Notification Bell + Dropdown -->
+      <div class="notification-wrapper" style="position:relative; cursor:pointer" (click)="toggleNotifications($event)">
+        <ion-icon name="notifications" class="bell"></ion-icon>
+        <div class="notif-badge" *ngIf="(unreadCount$ | async)! > 0"
+          style="position:absolute; top:-4px; right:12px; background:#EB445A; color:white; border-radius:50%; width:16px; height:16px; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; pointer-events:none; border:2px solid white;">
+          {{ unreadCount$ | async }}</div>
+
+        <div class="notifications-dropdown" *ngIf="showNotifications" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <span class="dropdown-title">Notificaciones</span>
+            <button class="mark-read-btn" (click)="markAllRead()" *ngIf="notifications.length > 0">Marcar todas</button>
+          </div>
+          <div class="notifications-list" *ngIf="notifications.length > 0">
+            <div class="notif-item" *ngFor="let n of notifications" [class.unread]="!n.read"
+              (click)="markNotifAsRead(n)">
+              <div class="notif-dot" [class.read]="n.read"></div>
+              <div class="notif-body">
+                <div class="notif-title">{{ n.title }}</div>
+                <div class="notif-text">{{ n.body }}</div>
+                <div class="notif-time">{{ getTimeAgo(n.date) }}</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-notifs" *ngIf="notifications.length === 0">
+            <ion-icon name="notifications-off-outline"></ion-icon>
+            <div class="empty-title">Sin notificaciones</div>
+            <div class="empty-subtitle">No hay notificaciones pendientes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avatar + Profile Dropdown -->
+      <div class="avatar-wrapper" style="position:relative; cursor:pointer" (click)="toggleProfile($event)">
+        <img [src]="'https://ui-avatars.com/api/?name=' + userFullName + '&background=02485a&color=fff'">
+
+        <div class="profile-fullscreen" *ngIf="showProfile" (click)="$event.stopPropagation()">
+          <div class="pf-header">
+            <ion-icon name="arrow-back-outline" class="pf-back" (click)="closeDropdowns(); $event.stopPropagation()"></ion-icon>
+            <div class="pf-title">Perfil</div>
+            <div style="width: 24px;"></div>
+          </div>
+
+          <div class="pf-content">
+            <div class="pf-avatar-section">
+              <div class="pf-avatar-wrapper">
+                <div class="pf-avatar-circle">
+                  {{ userFullName ? userFullName.substring(0, 2).toUpperCase() : 'US' }}
+                </div>
+                <div class="pf-badge-shield"><ion-icon name="shield-checkmark-sharp"></ion-icon></div>
+              </div>
+              <div class="pf-name">{{ userFullName ? userFullName.split(' ')[0] : 'Usuario' }}</div>
+              <div class="pf-risk-pill">
+                <ion-icon name="bar-chart-outline"></ion-icon>
+                {{ userTestInterpretation || 'Riesgo Medio' | titlecase }}
+              </div>
+            </div>
+
+            <div class="pf-stats-row">
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">PUNTOS</span>
+                <span class="pf-stat-val">{{ progresoService.puntos_actuales }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">RETOS</span>
+                <span class="pf-stat-val">{{ progresoService.stats.retos_completados }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+              <div class="pf-stat-card">
+                <span class="pf-stat-lbl">INSIGNIAS</span>
+                <span class="pf-stat-val">{{ progresoService.insigniasObtenidas.length }}</span>
+                <div class="pf-stat-line"></div>
+              </div>
+            </div>
+
+            <div class="pf-activity-container">
+              <h3 class="pf-activity-title">Activity Overview</h3>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="location-sharp"></ion-icon></div>
+                <div class="pf-item-text">
+                  <div class="pf-lbl">Ubicación</div>
+                  <div class="pf-val">{{ userLocationName || 'Desconocida' }}</div>
+                </div>
+              </div>
+
+              <div class="pf-activity-item">
+                <div class="pf-icon-wrap"><ion-icon name="calendar-outline"></ion-icon></div>
+                <div class="pf-item-text pf-no-border">
+                  <div class="pf-lbl">Última Evaluación</div>
+                  <div class="pf-val">{{ userTestDate || 'No realizada' }}</div>
+                </div>
+                <ion-icon name="chevron-forward" class="pf-chevron"></ion-icon>
+              </div>
+            </div>
+
+            <div class="pf-tip-card">
+              <span class="pf-tip-lbl">TIP DEL DÍA</span>
+              <p class="pf-tip-desc">Mantén el ritmo, estás a 10 puntos de tu siguiente insignia.</p>
+              <ion-icon name="star" class="pf-tip-watermark"></ion-icon>
+            </div>
+
+            <button class="pf-btn-logout" (click)="cerrarSesion()">
+              <ion-icon name="log-out-outline"></ion-icon> Cerrar Sesión
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-section">
+    <div class="title-block">
+      <span class="suptitle">ANÁLISIS TERRITORIAL</span>
+      <h1 class="main-title">Mapa Territorial</h1>
+    </div>
+  </div>
+
+  <div class="map-wrapper">
+    <div id="map" #map class="map-view"></div>
+
+    <!-- Label de ubicación actual (se actualiza dinámicamente) -->
+    <div class="location-label-overlay" *ngIf="locationLabel !== 'Tu ubicación'">
+      <ion-icon name="location" class="loc-dot"></ion-icon>
+      <span>{{ locationLabel }}</span>
+    </div>
+
+    <!-- Floating Action Buttons on Map -->
+    <div class="map-controls">
+      <button class="recenter-btn" (click)="recenterMap()" title="Centrar en mi ubicación">
+        <ion-icon name="locate-outline"></ion-icon>
+      </button>
+    </div>
+
+
+    <div class="bottom-left-chip">
+      <span class="status-dot"></span>
+      Zonas de Bienestar
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="map-loading-overlay" *ngIf="isLoadingMetrics">
+      <ion-spinner name="crescent"></ion-spinner>
+      <span>Buscando puntos de interés...</span>
+    </div>
+
+    <!-- selected POI Card Overlay -->
+    <div class="poi-detail-overlay" *ngIf="selectedZone && isSheetOpen">
+       <button class="close-poi" (click)="setSheetOpen(false)"><ion-icon name="close"></ion-icon></button>
+       <div class="poi-type-badge" [style.background]="selectedZone.color + '1a'" [style.color]="selectedZone.color">{{ selectedZone.riskLevel }}</div>
+       <h3 class="poi-name">{{ selectedZone.name }}</h3>
+       <p class="poi-desc">{{ selectedZone.desc }}</p>
+       <div class="poi-actions">
+         <button class="poi-btn-route" (click)="verEvaluacion()">
+            <ion-icon name="navigate-circle"></ion-icon> Ver más
+         </button>
+       </div>
+    </div>
+  </div>
+
+  <div class="analysis-card">
+    <div class="card-top">
+      <div class="card-titles">
+        <h2>Análisis de Entorno</h2>
+        <p>Evaluación de habitabilidad urbana local</p>
+      </div>
+      <div class="score-watermark">{{ entornoScore }}%</div>
+    </div>
+
+    <div class="metrics-container">
+      <div class="metric-item">
+        <div class="metric-header">
+          <div class="metric-name">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#092A1A" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M13.5 10L12 15L15 22"></path>
+              <path d="M9 22L12 15L11 8L5 10"></path>
+              <circle cx="12" cy="4" r="2"></circle>
+            </svg>
+            <span>Caminabilidad</span>
+          </div>
+          <div class="metric-val">{{ caminabilidadPts }} pts</div>
+        </div>
+        <div class="prog-bar-bg">
+          <div class="prog-bar-fill" [style.width]="(caminabilidadPts / 150 * 100) + '%'"></div>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <div class="metric-header">
+          <div class="metric-name">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#092A1A" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15 5 17 5 17 5s0 2-1.1 7.2A7 7 0 0 1 11 20z"></path>
+              <path d="M11 20v-8"></path>
+            </svg>
+            <span>Zonas Verdes</span>
+          </div>
+          <div class="metric-val">{{ areasVerdesPts }} pts</div>
+        </div>
+        <div class="prog-bar-bg">
+          <div class="prog-bar-fill" [style.width]="areasVerdesPts + '%'"></div>
+        </div>
+      </div>
+    </div>
+
+    <button class="ver-reporte-btn" (click)="verEvaluacion()">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" style="margin-right: 10px;">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+      </svg>
+      Ver reporte detallado
+    </button>
+  </div>
+
+</ion-content>

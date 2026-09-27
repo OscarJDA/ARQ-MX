@@ -1,0 +1,49 @@
+.splash-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeOut 0.5s ease 2s forwards;
+  transition: background-color 0.3s ease;
+  
+  img {
+    width: 150px;
+    height: 150px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--ion-color-primary, #092A1A);
+    margin: 0;
+    transition: color 0.3s ease;
+    text-align: center;
+    padding: 0 20px;
+  }
+}
+
+:host-context(body.dark-theme) {
+  .splash-screen {
+    background: #1E1E1E;
+
+    h1 {
+      color: #4CAF7D;
+    }
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}

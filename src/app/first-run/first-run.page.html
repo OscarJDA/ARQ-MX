@@ -1,0 +1,218 @@
+<ion-content class="assessment-content">
+
+  <!-- ═══════════ CUSTOM HEADER ═══════════ -->
+  <div class="fr-header">
+    <ion-icon name="arrow-back-outline" class="fr-back" (click)="goBack()"></ion-icon>
+    <div class="fr-header-center">
+      <img src="assets/images/Logo.png" alt="Logo" class="fr-logo">
+      <span class="fr-brand">ARQ-Metabólica MX</span>
+    </div>
+    <div class="fr-header-spacer"></div>
+  </div>
+
+  <!-- ═══════════ HERO SECTION ═══════════ -->
+  <div class="fr-hero" *ngIf="!showResults">
+    <div class="fr-hero-icon">
+      <ion-icon name="fitness-outline"></ion-icon>
+    </div>
+    <h1 class="fr-hero-title">Evaluación de<br>Resistencia a la Insulina</h1>
+    <p class="fr-hero-subtitle">Responde con honestidad para obtener un perfil metabólico personalizado.</p>
+  </div>
+
+  <!-- ═══════════ VISTA DEL QUIZ ═══════════ -->
+  <div *ngIf="!showResults" class="slide-in">
+
+    <!-- Name Input Card -->
+    <div class="cards-wrapper">
+      <div class="category-card name-card">
+        <div class="name-card-header">
+          <div class="name-icon-wrap">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+          <div>
+            <h2 class="category-title" style="margin-bottom: 4px;">Tus Datos</h2>
+            <p class="name-hint">Esta información nos ayuda a personalizar tu experiencia y calcular métricas importantes.</p>
+          </div>
+        </div>
+        
+        <div class="name-input-wrap" style="margin-bottom: 12px;">
+          <ion-icon name="person-circle-outline" class="name-input-icon"></ion-icon>
+          <input type="text" class="name-input" [(ngModel)]="userName" placeholder="¿Cómo te llamas?" maxlength="60" autocomplete="name">
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div class="name-input-wrap" style="flex: 1;">
+            <ion-icon name="barbell-outline" class="name-input-icon"></ion-icon>
+            <input type="number" class="name-input" [(ngModel)]="userPeso" placeholder="Peso (kg)">
+          </div>
+          <div class="name-input-wrap" style="flex: 1;">
+            <ion-icon name="resize-outline" class="name-input-icon" style="transform: rotate(90deg);"></ion-icon>
+            <input type="number" class="name-input" [(ngModel)]="userEstatura" placeholder="Altura (cm)">
+          </div>
+        </div>
+
+        <div *ngIf="imc > 0" style="background: rgba(132, 56, 232, 0.05); padding: 12px; border-radius: 12px; border: 1px solid rgba(132, 56, 232, 0.1);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 600; color: var(--text-dark); font-size: 0.95rem;">Tu IMC:</span>
+            <span style="font-weight: 800; color: #8438E8; font-size: 1.1rem;">{{ imc | number:'1.1-1' }}</span>
+          </div>
+          <div style="text-align: right; font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px;">
+            {{ imcLabel }}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- Question cards -->
+    <div class="cards-wrapper">
+      <div class="category-card" *ngFor="let category of getCategories()">
+        <h2 class="category-title">{{ category }}</h2>
+
+        <div class="question-row" *ngFor="let q of getQuestionsByCategory(category)">
+          <p class="question-text">{{ q.text }}</p>
+          <ion-toggle mode="md" class="q-toggle" [(ngModel)]="q.value"></ion-toggle>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button class="result-btn" (click)="finalizar()" [disabled]="!userName.trim() || !userPeso || !userEstatura">
+        <ion-icon name="checkmark-circle-outline" style="margin-right: 8px; font-size: 20px;"></ion-icon>
+        VER RESULTADOS
+      </button>
+      <p class="btn-hint" *ngIf="!userName.trim() || !userPeso || !userEstatura">Completa tus datos para continuar</p>
+    </div>
+  </div>
+
+  <!-- ═══════════ VISTA DE RESULTADOS ═══════════ -->
+  <div *ngIf="showResults" class="slide-in results-view">
+
+    <div class="cards-wrapper" style="margin-top: 10px;">
+
+      <!-- Interpretación -->
+      <div class="category-card result-summary">
+        <h2 class="category-title" style="text-align: center; margin-bottom: 24px;">Tus Resultados</h2>
+
+        <div class="score-circle"
+          [ngClass]="{'bajo': siCount <= 3, 'mod': siCount > 3 && siCount <= 7, 'alto': siCount > 7}">
+          <span class="score-number">{{ siCount }}</span>
+          <span class="score-label">Sí</span>
+        </div>
+
+        <h3 class="interpretation-title" style="text-align: center; color: var(--text-dark); margin-top: 16px;">
+          {{ resultadoInterpretacion }}
+        </h3>
+      </div>
+
+      <!-- Análisis con IA -->
+      <div class="category-card ai-analysis-card">
+        <h2 class="category-title" style="display: flex; align-items: center; gap: 8px; color: #8438E8; margin-bottom: 12px;">
+          <ion-icon name="sparkles"></ion-icon> Análisis Personalizado AI
+        </h2>
+        <div *ngIf="isGeneratingAI" class="ai-loading" style="text-align: center; padding: 15px 0;">
+          <ion-spinner name="crescent" style="color: #8438E8; margin-bottom: 10px;"></ion-spinner>
+          <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Gemini está analizando tus respuestas...</p>
+        </div>
+        <div *ngIf="!isGeneratingAI && aiAnalysis">
+          <p class="question-text" [innerHTML]="aiAnalysis" style="line-height: 1.6; margin: 0;"></p>
+        </div>
+      </div>
+
+      <!-- Pruebas Médicas Recomendadas -->
+      <div class="category-card">
+        <h2 class="category-title">Pruebas Médicas Recomendadas</h2>
+        <p class="question-text mb-3">Para confirmar, consulta estudios como:</p>
+        <ul class="custom-list">
+          <li>Glucosa en ayuno</li>
+          <li>Insulina en ayuno</li>
+          <li>Índice HOMA-IR</li>
+          <li>Hemoglobina glucosilada (HbA1c)</li>
+        </ul>
+      </div>
+
+      <!-- Plan educativo para alimentación saludable -->
+      <div class="category-card">
+        <h2 class="category-title" style="margin-bottom: 8px;">Plan de Alimentación</h2>
+        <p class="subtitle-text mb-3"><strong>Objetivo:</strong> Mejorar la sensibilidad a la insulina y prevenir
+          enfermedades como la diabetes tipo 2.</p>
+
+        <h3 class="section-subtitle">1. Método del Plato (práctico)</h3>
+        <p class="question-text mb-1">Divide tu plato así:</p>
+        <ul class="custom-list mb-3">
+          <li><strong>50% verduras</strong> (fibra)</li>
+          <li><strong>25% proteína</strong> (pollo, pescado, huevo, legumbres)</li>
+          <li><strong>25% carbohidratos complejos</strong> (arroz integral, avena)</li>
+        </ul>
+
+        <h3 class="section-subtitle">2. Evitar o Reducir</h3>
+        <ul class="custom-list mb-3">
+          <li>Azúcar refinada</li>
+          <li>Refrescos y jugos industriales</li>
+          <li>Pan blanco y harinas refinadas</li>
+          <li>Ultra procesados</li>
+        </ul>
+
+        <h3 class="section-subtitle">3. Priorizar Alimentos</h3>
+        <ul class="custom-list mb-3">
+          <li><strong>Verduras</strong> (espinaca, brócoli, nopales)</li>
+          <li><strong>Grasas saludables</strong> (aguacate, nueces, aceite de oliva)</li>
+          <li><strong>Proteínas magras</strong></li>
+          <li><strong>Fibra</strong> (avena, semillas)</li>
+        </ul>
+
+        <h3 class="section-subtitle">4. Hábitos Clave</h3>
+        <ul class="custom-list mb-3">
+          <li>Comer cada 3–5 horas (evita picos de glucosa)</li>
+          <li>No saltarse el desayuno</li>
+          <li>Hidratarse bien (2–3 L agua)</li>
+          <li>Dormir 7–8 horas</li>
+        </ul>
+
+        <h3 class="section-subtitle">5. Actividad Física</h3>
+        <ul class="custom-list">
+          <li>150 min/semana (caminar, gym, bici)</li>
+          <li>Ejercicio de fuerza (muy importante para la insulina)</li>
+        </ul>
+      </div>
+
+      <!-- Señales de alerta -->
+      <div class="category-card warning-card">
+        <h2 class="category-title warning-title"
+          style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <ion-icon name="warning-outline"></ion-icon> Señales de Alerta
+        </h2>
+        <p class="question-text warning-text mb-3">Consulta con un médico si tienes:</p>
+        <ul class="custom-list warning-list" style="margin-bottom: 0;">
+          <li>Mareos frecuentes</li>
+          <li>Visión borrosa</li>
+          <li>Mucha sed o ganas de orinar</li>
+          <li>Fatiga extrema</li>
+        </ul>
+      </div>
+
+      <!-- Consejo clave -->
+      <div class="category-card highlight-card">
+        <h2 class="category-title highlight-title" style="margin-bottom: 12px;">Consejo Clave</h2>
+        <p class="question-text highlight-text" style="margin: 0; font-weight: 500; font-size: 16px;">
+          La resistencia a la insulina es reversible en muchos casos con cambios constantes (no extremos).
+        </p>
+      </div>
+
+    </div>
+
+    <div class="btn-container">
+      <button class="result-btn secondary" (click)="rehacerCuestionario()" style="margin-bottom: 12px; background: transparent; border: 2px solid var(--ion-color-medium); color: var(--text-dark);">
+        <ion-icon name="refresh-outline" style="margin-right: 8px; font-size: 20px;"></ion-icon>
+        VOLVER A EVALUAR
+      </button>
+      <button class="result-btn" (click)="continuar()">
+        <ion-icon name="arrow-forward-outline" style="margin-right: 8px; font-size: 20px;"></ion-icon>
+        CONTINUAR A LA APP
+      </button>
+    </div>
+
+  </div>
+
+</ion-content>

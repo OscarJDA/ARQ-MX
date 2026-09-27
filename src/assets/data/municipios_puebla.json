@@ -1,0 +1,104 @@
+[
+  {
+    "municipio": "San Andrés Cholula",
+    "im": 0.10,
+    "poblacion": 154448,
+    "densidad": "Media-Alta"
+  },
+  {
+    "municipio": "Puebla",
+    "im": 0.12,
+    "poblacion": 1692181,
+    "densidad": "Muy Alta"
+  },
+  {
+    "municipio": "San Pedro Cholula",
+    "im": 0.18,
+    "poblacion": 138433,
+    "densidad": "Media"
+  },
+  {
+    "municipio": "Cuautlancingo",
+    "im": 0.22,
+    "poblacion": 111613,
+    "densidad": "Media-Alta"
+  },
+  {
+    "municipio": "Amozoc",
+    "im": 0.38,
+    "poblacion": 125827,
+    "densidad": "Media"
+  },
+  {
+    "municipio": "Ocoyucan",
+    "im": 0.45,
+    "poblacion": 42669,
+    "densidad": "Baja-Media"
+  },
+  {
+    "municipio": "Huejotzingo",
+    "im": 0.35,
+    "poblacion": 92453,
+    "densidad": "Media"
+  },
+  {
+    "municipio": "Atlixco",
+    "im": 0.25,
+    "poblacion": 141701,
+    "densidad": "Media"
+  },
+  {
+    "municipio": "Coronango",
+    "im": 0.42,
+    "poblacion": 46836,
+    "densidad": "Baja"
+  },
+  {
+    "municipio": "Juan C. Bonilla",
+    "im": 0.48,
+    "poblacion": 23783,
+    "densidad": "Muy Baja"
+  },
+  {
+    "municipio": "Tehuacán",
+    "im": 0.28,
+    "poblacion": 327312,
+    "densidad": "Alta"
+  },
+  {
+    "municipio": "San Martín Texmelucan",
+    "im": 0.24,
+    "poblacion": 155738,
+    "densidad": "Alta"
+  },
+  {
+    "municipio": "San Gregorio Atzompa",
+    "im": 0.52,
+    "poblacion": 9171,
+    "densidad": "Baja"
+  },
+  {
+    "municipio": "Tlaltenango",
+    "im": 0.50,
+    "poblacion": 7461,
+    "densidad": "Baja"
+  },
+  {
+    "municipio": "Xoxtla",
+    "im": 0.30,
+    "poblacion": 12411,
+    "densidad": "Media"
+  },
+  {
+    "municipio": "Calpan",
+    "im": 0.60,
+    "poblacion": 15271,
+    "densidad": "Baja"
+  },
+  {
+    "municipio": "San Jerónimo Tecuanipan",
+    "im": 0.65,
+    "poblacion": 6597,
+    "densidad": "Baja"
+  }
+]
