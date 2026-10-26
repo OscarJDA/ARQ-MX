@@ -32,6 +32,25 @@ A través de geolocalización, análisis espacial de puntos de interés (POIs), 
 
 ---
 
+## 📱 Capturas
+
+> Capturas generadas con datos de demostración.
+
+| Pantalla | Vista |
+| :--- | :---: |
+| **Acceso**<br>Registro e inicio de sesión con datos locales. | <img src="docs/screenshots/01-auth.png" width="260"> |
+| **Evaluación inicial**<br>Perfil, medidas y síntomas para estimar el riesgo base. | <img src="docs/screenshots/02-onboarding.png" width="260"> |
+| **Inicio**<br>IARRI del entorno con caminabilidad, conectividad y áreas verdes. | <img src="docs/screenshots/03-inicio.png" width="260"> |
+| **Mapa**<br>POIs del entorno y análisis espacial de la zona. | <img src="docs/screenshots/04-mapa.png" width="260"> |
+| **Retos**<br>Progreso semanal, insignias y misiones contextuales. | <img src="docs/screenshots/05-retos.png" width="260"> |
+| **Consejos**<br>Guía de diseño con intervenciones priorizadas por zona. | <img src="docs/screenshots/06-consejos.png" width="260"> |
+| **Progreso**<br>Comparación del IARRI contra la distribución poblacional. | <img src="docs/screenshots/07-progreso.png" width="260"> |
+| **Planificador de entorno**<br>Simulador IARRI: variables actuales vs. proyectadas. | <img src="docs/screenshots/08-calculadora.png" width="260"> |
+| **Resultados**<br>Perfil metabólico y recomendaciones generadas con IA. | <img src="docs/screenshots/09-resultados.png" width="260"> |
+| **Modo oscuro**<br>Inicio con el tema oscuro activo. | <img src="docs/screenshots/10-inicio-oscuro.png" width="260"> |
+
+---
+
 ## 🛠️ Tecnologías Utilizadas
 
 * **Framework Base:** [Ionic 8](https://ionicframework.com/) & [Angular 20](https://angular.dev/)
